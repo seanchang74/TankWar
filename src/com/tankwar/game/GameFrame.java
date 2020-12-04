@@ -1,19 +1,27 @@
 package com.tankwar.game;
+import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.image.BufferedImage;
 
-import static com.tankwar.utilis.Lang.*;
+import static com.tankwar.utilis.Constant.*;
 
 
 //遊戲主畫面
 public class GameFrame extends Frame implements Runnable{
+    //雙緩衝用圖片
+    private BufferedImage bufImg = new BufferedImage(FRAME_WIDTH,FRAME_HEIGHT,BufferedImage.TYPE_4BYTE_ABGR);
     //遊戲狀態
     public static int gameState;
     //菜單被選
     private int menuIndex;
+    //最上方的高度
+    public static int titleBarH;
+    //宣告坦克
+    private Tank my_tank;
     /**
      *  對視窗進行初始化
      */
@@ -42,14 +50,18 @@ public class GameFrame extends Frame implements Runnable{
         setLocationRelativeTo(null);
         //設定可見
         setVisible(true);
+        //上方標題的高度
+        titleBarH = getInsets().top;
 
     }
 
     /**
      * 負責繪製的內容，所有需要在畫面上顯示的內容，都透過此method調用
-     * @param g
+     * @param g1
      */
-    public void update(Graphics g){
+    public void update(Graphics g1){
+        //先畫在一張圖上
+        Graphics g = bufImg.getGraphics();
         g.setFont(FONT);
         switch (gameState){
             case STATE_MENU:
@@ -66,6 +78,8 @@ public class GameFrame extends Frame implements Runnable{
                 break;
 
         }
+        //再畫到系統上
+        g1.drawImage(bufImg,0,0,null);
     }
 
     /**
@@ -94,6 +108,8 @@ public class GameFrame extends Frame implements Runnable{
         //繪製背景
         g.setColor(Color.BLACK);
         g.fillRect(0,0,FRAME_WIDTH,FRAME_HEIGHT);
+        //繪製坦克
+        my_tank.draw(g);
     }
     private void drawOver(Graphics g) {
     }
@@ -120,16 +136,16 @@ public class GameFrame extends Frame implements Runnable{
                 int keyCode = e.getKeyCode();
                 switch (gameState){
                     case STATE_MENU:
-                        keyEventMenu(keyCode);
+                        keyPressedEventMenu(keyCode);
                         break;
                     case STATE_HELP:
-                        keyEventHelp(keyCode);
+                        keyPressedEventHelp(keyCode);
                         break;
                     case STATE_RUN:
-                        keyEventRun(keyCode);
+                        keyPressedEventRun(keyCode);
                         break;
                     case STATE_OVER:
-                        keyEventOver(keyCode);
+                        keyPressedEventOver(keyCode);
                         break;
 
                 }
@@ -139,11 +155,17 @@ public class GameFrame extends Frame implements Runnable{
             //按鍵鬆開
             @Override
             public void keyReleased(KeyEvent e) {
-                super.keyReleased(e);
+                //獲得按鍵的值
+                int keyCode = e.getKeyCode();
+                if ( gameState == STATE_RUN){
+                    keyReleasedEventRun(keyCode);
+                }
             }
         });
     }
-    private void keyEventMenu(int keyCode) {
+
+
+    private void keyPressedEventMenu(int keyCode) {
         switch (keyCode){
             case KeyEvent.VK_UP:
             case KeyEvent.VK_W:
@@ -172,17 +194,49 @@ public class GameFrame extends Frame implements Runnable{
     private void newGame() {
         gameState = STATE_RUN;
         //繪製坦克
+        my_tank = new Tank(300,400,Tank.DIR_DOWN);
     }
 
-    private void keyEventHelp(int keyCode) {
-
-    }
-
-    private void keyEventRun(int keyCode) {
+    private void keyPressedEventHelp(int keyCode) {
 
     }
 
-    private void keyEventOver(int keyCode) {
+    private void keyPressedEventRun(int keyCode) {
+        switch (keyCode){
+            case KeyEvent.VK_W:
+                my_tank.setDir(Tank.DIR_UP);
+                my_tank.setStatus(Tank.STATE_MOVE);
+                break;
+            case KeyEvent.VK_S:
+                my_tank.setDir(Tank.DIR_DOWN);
+                my_tank.setStatus(Tank.STATE_MOVE);
+                break;
+            case KeyEvent.VK_A:
+                my_tank.setDir(Tank.DIR_LEFT);
+                my_tank.setStatus(Tank.STATE_MOVE);
+                break;
+            case KeyEvent.VK_D:
+                my_tank.setDir(Tank.DIR_RIGHT);
+                my_tank.setStatus(Tank.STATE_MOVE);
+                break;
+            case KeyEvent.VK_SPACE:
+                my_tank.fire();
+                break;
+        }
+    }
+    //按鍵被鬆開的處理
+    private void keyReleasedEventRun(int keyCode) {
+        switch (keyCode){
+            case KeyEvent.VK_W:
+            case KeyEvent.VK_S:
+            case KeyEvent.VK_A:
+            case KeyEvent.VK_D:
+                my_tank.setStatus(Tank.STATE_STAND);
+                break;
+        }
+    }
+
+    private void keyPressedEventOver(int keyCode) {
 
     }
 

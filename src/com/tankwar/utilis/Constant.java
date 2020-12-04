@@ -5,7 +5,7 @@ import java.awt.*;
 /*
 遊戲內常數管理
  */
-public class Lang {
+public class Constant {
     /********************遊戲視窗相關*******************/
     public static final String GAME_TITLE = "坦克大戰1.0";
     public static final int FRAME_WIDTH = 1024;
