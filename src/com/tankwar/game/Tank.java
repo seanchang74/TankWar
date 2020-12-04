@@ -20,18 +20,25 @@ public class Tank {
     public static final int STATE_STAND = 0;
     public static final int STATE_MOVE = 0;
     public static final int STATE_DIE = 0;
+    //坦克初始血量
+    public static final int DEFAULT_HP = 1000;
 
     //座標
     private  int x,y;
     private int atk;
-    private int hp;
+    private int hp = DEFAULT_HP;
     private int speed;
     private int dir;
-    private int status;
+    private int status = STATE_STAND;
 
 
     //TODO 砲彈
     private List bullets = new ArrayList();
 
+    public Tank(int x,int y,int dir){
+        this.x = x;
+        this.y = y;
+        this.dir = dir;
+    }
 
 }
