@@ -18,6 +18,8 @@ public class Bullet {
     private int dir;
     private int atk;
     private Color color = Color.ORANGE;
+    //子彈是否可見
+    private boolean visible = true;
 
     public Bullet(int x,int y,int dir,int atk){
         this.x = x;
@@ -26,12 +28,15 @@ public class Bullet {
         this.atk = atk;
 
     }
+    //給物件池使用，所有屬性皆為默認值
+    public Bullet(){}
 
     /**
      * 繪製砲彈
      * @param g
      */
     public void draw(Graphics g){
+        if(!visible)return;
         logic();
         g.setColor(color);
         g.fillOval(x-RADIUS,y-RADIUS,RADIUS<<1,RADIUS<<1);
@@ -48,15 +53,19 @@ public class Bullet {
         switch (dir){
             case Tank.DIR_UP:
                 y -= speed;
+                if(y<0)visible = false;
                 break;
             case Tank.DIR_DOWN:
                 y += speed;
+                if(y>Constant.FRAME_HEIGHT)visible = false;
                 break;
             case Tank.DIR_LEFT:
                 x -= speed;
+                if(x<0)visible = false;
                 break;
             case Tank.DIR_RIGHT:
                 x += speed;
+                if(x>Constant.FRAME_WIDTH)visible = false;
                 break;
         }
     }
@@ -99,5 +108,13 @@ public class Bullet {
 
     public void setAtk(int atk) {
         this.atk = atk;
+    }
+
+    public void setVisible(boolean visible) {
+        this.visible = visible;
+    }
+
+    public boolean isVisible() {
+        return visible;
     }
 }

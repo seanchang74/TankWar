@@ -1,5 +1,6 @@
 package com.tankwar.game;
 
+import com.tankwar.utilis.BulletsPool;
 import com.tankwar.utilis.Constant;
 import com.tankwar.utilis.MyUtil;
 
@@ -230,7 +231,14 @@ public class Tank {
                 bulletX += 1.5*RADIUS;
                 break;
         }
-        Bullet bullet =  new Bullet(bulletX,bulletY,dir,atk);
+        //從子彈池拿子彈
+        Bullet bullet = BulletsPool.get();
+        //子彈屬性設定
+        bullet.setX(x);
+        bullet.setY(y);
+        bullet.setDir(dir);
+        bullet.setAtk(atk);
+        bullet.setVisible(true);
         bullets.add(bullet);
     }
 
@@ -241,6 +249,13 @@ public class Tank {
     private void drawBullets(Graphics g){
         for (Bullet bullet: bullets){
             bullet.draw(g);
+        }
+        for (int i=0;i<bullets.size();i++){
+            Bullet bullet = bullets.get(i);
+            if(!bullet.isVisible()){
+                Bullet remove = bullets.remove(i);
+                BulletsPool.theReturn(remove);
+            }
         }
     }
 }
