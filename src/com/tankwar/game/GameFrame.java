@@ -119,6 +119,8 @@ public class GameFrame extends Frame implements Runnable{
         drawEnemies(g);
         //繪製坦克
         Player_Tank_1.draw(g);
+        //碰撞檢測
+        bulletCollideTank();
     }
     public  void drawEnemies(Graphics g){
         for (int i = 0; i < enemies.size(); i++) {
@@ -282,6 +284,18 @@ public class GameFrame extends Frame implements Runnable{
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    //敵人子彈和玩家坦克碰撞
+    //玩家坦克子彈和所有敵人碰撞
+    private void bulletCollideTank(){
+        //敵人坦克的子彈和玩家坦克的碰撞
+        for(Tank enemy : enemies){
+            enemy.collideBullets(Player_Tank_1.getBullets());
+        }
+        for (Tank enemy : enemies) {
+            Player_Tank_1.collideBullets(enemy.getBullets());
         }
     }
 }

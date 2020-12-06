@@ -219,4 +219,18 @@ public abstract  class Tank {
             }
         }
     }
+
+    //坦克和子彈碰撞判斷
+    public void collideBullets(List<Bullet> bullets){
+        //對所有子彈和坦克進行碰撞檢測
+        for(Bullet bullet : bullets){
+            //碰撞發生
+            if(MyUtil.isCollide(x,y,RADIUS,bullet.getX(),bullet.getY())){
+                //子彈消失
+                bullet.setVisible(false);
+                //坦克受到傷害
+                //添加爆炸效果
+            }
+        }
+    }
 }

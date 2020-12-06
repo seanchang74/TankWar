@@ -11,8 +11,12 @@ public class Constant {
     public static final int FRAME_WIDTH = 1024;
     public static final int FRAME_HEIGHT = 576;
 
-    public static final int FRAME_X = 600;
-    public static final int FRAME_Y = 600;
+    //動態獲得系統的解析度
+    public static final int SCREEN_W = Toolkit.getDefaultToolkit().getScreenSize().width;
+    public static final int SCREEN_H = Toolkit.getDefaultToolkit().getScreenSize().height;
+
+    public static final int FRAME_X = SCREEN_W - FRAME_WIDTH >> 1;
+    public static final int FRAME_Y = SCREEN_H - FRAME_HEIGHT >> 1;
 
     /********************遊戲菜單相關*******************/
     public  static final int STATE_MENU = 0;

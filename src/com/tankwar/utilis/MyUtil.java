@@ -25,4 +25,23 @@ public class MyUtil {
         int blue = getRandomNumber(0,256);
         return new Color(red,green,blue);
     }
+
+    /**
+     * 判斷點是否和方形相交
+     * @param rectX  正方形中心點的X座標
+     * @param rectY  正方形中心點的Y座標
+     * @param radius  正方形的邊長的一半
+     * @param pointX  點的X座標
+     * @param pointY  點的Y座標
+     * @return 如果在內部返回true else false
+     */
+    public static final boolean isCollide(int rectX,int rectY,int radius,int pointX,int pointY){
+        //正方形中心點和 點的X，Y軸的距離
+        int disX = Math.abs(rectX-pointX);
+        int disY = Math.abs(rectY-pointY);
+        if (disX < radius && disY < radius){
+            return true;
+        }
+        else return false;
+    }
 }
