@@ -192,22 +192,6 @@ public abstract  class Tank {
      * 坦克開火
      */
     public void fire(){
-        int bulletX = x;
-        int bulletY = y;
-        switch (dir){
-            case DIR_UP:
-                bulletY -= 1.5*RADIUS;
-                break;
-            case DIR_DOWN:
-                bulletY += 1.5*RADIUS;
-                break;
-            case DIR_LEFT:
-                bulletX -= 1.5*RADIUS;
-                break;
-            case DIR_RIGHT:
-                bulletX += 1.5*RADIUS;
-                break;
-        }
         //從子彈池拿子彈
         Bullet bullet = BulletsPool.get();
         //子彈屬性設定

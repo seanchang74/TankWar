@@ -1,11 +1,8 @@
 package com.tankwar.game;
-<<<<<<< HEAD
-=======
 import com.tankwar.tank.EnemyTank;
-import com.tankwar.tank.MyTank;
+import com.tankwar.tank.OurTank;
 import com.tankwar.tank.Tank;
 
->>>>>>> ebffada6442154067b37ce8da90469c5160e1de0
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -212,22 +209,14 @@ public class GameFrame extends Frame implements Runnable{
     private void newGame() {
         gameState = STATE_RUN;
         //繪製坦克
-<<<<<<< HEAD
-        Player_Tank_1 = new Tank(300,400,Tank.DIR_DOWN);
-=======
-        Player_Tank_1 = new MyTank(300,400,Tank.DIR_DOWN);
->>>>>>> ebffada6442154067b37ce8da90469c5160e1de0
+        Player_Tank_1 = new OurTank(300,400,Tank.DIR_DOWN);
         //產生敵人
         new Thread(){
             @Override
             public void run() {
                 while (true){
                     if(enemies.size()< ENEMY_MAX_COUNT){
-<<<<<<< HEAD
-                        Tank enemy = Tank.createEnemy();
-=======
                         Tank enemy = EnemyTank.createEnemy();
->>>>>>> ebffada6442154067b37ce8da90469c5160e1de0
                         enemies.add(enemy);
                     }
                     try {

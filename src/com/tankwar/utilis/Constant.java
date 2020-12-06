@@ -36,4 +36,9 @@ public class Constant {
     //最大敵人數量
     public static final int ENEMY_MAX_COUNT = 8;
     public static final int ENEMY_BORN_INTERVAL = 5000;
+
+    //AI動作間隔時間
+    public static final int ENEMY_AI_INTERVAL = 1500;
+    //AI開火機率
+    public static final double ENEMY_FIRE_CHANGE = 0.05;
 }

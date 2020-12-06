@@ -5,7 +5,7 @@ import java.awt.*;
 /**
  * 玩家坦克類
  */
-public class MyTank extends Tank{
+public class OurTank extends Tank{
     //坦克圖片定義
     private static Image[] p1_tankImg;
     private static Image[] p2_tankImg;
@@ -26,7 +26,7 @@ public class MyTank extends Tank{
         p2_tankImg[3] = Toolkit.getDefaultToolkit().createImage("res/image/p2tankR.gif");
     }
 
-    public MyTank(int x, int y, int dir){
+    public OurTank(int x, int y, int dir){
         super(x,y,dir);
     }
 

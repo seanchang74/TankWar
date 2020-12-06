@@ -1,9 +1,5 @@
 package com.tankwar.game;
-
-<<<<<<< HEAD
-=======
 import com.tankwar.tank.Tank;
->>>>>>> ebffada6442154067b37ce8da90469c5160e1de0
 import com.tankwar.utilis.Constant;
 
 import java.awt.*;
