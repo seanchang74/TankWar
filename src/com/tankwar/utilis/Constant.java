@@ -32,4 +32,8 @@ public class Constant {
 
     //螢幕刷新
     public static final int REPAINT_INT = 30;
+
+    //最大敵人數量
+    public static final int ENEMY_MAX_COUNT = 8;
+    public static final int ENEMY_BORN_INTERVAL = 5000;
 }

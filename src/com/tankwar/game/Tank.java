@@ -18,6 +18,7 @@ public class Tank {
     //坦克圖片定義
     private static Image[] p1_tankImg;
     private static Image[] p2_tankImg;
+    private static Image[] enemy_tankImg;
     //圖片初始化
     static { //p1
         p1_tankImg = new Image[4];
@@ -32,6 +33,13 @@ public class Tank {
         p2_tankImg[1] = Toolkit.getDefaultToolkit().createImage("res/image/p2tankD.gif");
         p2_tankImg[2] = Toolkit.getDefaultToolkit().createImage("res/image/p2tankL.gif");
         p2_tankImg[3] = Toolkit.getDefaultToolkit().createImage("res/image/p2tankR.gif");
+    }
+    static { //enemy
+        enemy_tankImg = new Image[4];
+        enemy_tankImg[0] = Toolkit.getDefaultToolkit().createImage("res/image/enemy1U.gif");
+        enemy_tankImg[1] = Toolkit.getDefaultToolkit().createImage("res/image/enemy1D.gif");
+        enemy_tankImg[2] = Toolkit.getDefaultToolkit().createImage("res/image/enemy1L.gif");
+        enemy_tankImg[3] = Toolkit.getDefaultToolkit().createImage("res/image/enemy1R.gif");
     }
     //四個方向
     public static final int DIR_UP = 0;
@@ -58,6 +66,7 @@ public class Tank {
     private int dir;
     private int status = STATE_STAND;
     private Color color;
+    private boolean isEnemy = false;
 
 
     //TODO 砲彈
@@ -68,6 +77,16 @@ public class Tank {
         this.y = y;
         this.dir = dir;
         color = MyUtil.getRandomColor();
+    }
+
+    public static Tank createEnemy(){
+        int x = MyUtil.getRandomNumber(0,2) == 0?RADIUS : Constant.FRAME_WIDTH-RADIUS;
+        int y = GameFrame.titleBarH +RADIUS;
+        int dir = DIR_DOWN;
+        Tank enemy = new Tank(x, y, dir);
+        enemy.isEnemy = true;
+        enemy.setStatus(STATE_MOVE);
+        return enemy;
     }
 
 
@@ -86,19 +105,11 @@ public class Tank {
     private void drawTank(Graphics g){
 //        g.drawImage(p1_tankImg[0],x-RADIUS,y-RADIUS,null );
 
-        switch (dir){
-            case DIR_UP:
-                g.drawImage(p1_tankImg[0],x-RADIUS,y-RADIUS,null );
-                break;
-            case DIR_DOWN:
-                g.drawImage(p1_tankImg[1],x-RADIUS,y-RADIUS,null );
-                break;
-            case DIR_LEFT:
-                g.drawImage(p1_tankImg[2],x-RADIUS,y-RADIUS,null );
-                break;
-            case DIR_RIGHT:
-                g.drawImage(p1_tankImg[3],x-RADIUS,y-RADIUS,null );
-                break;
+        if(isEnemy){
+            g.drawImage(enemy_tankImg[dir],x-RADIUS,y-RADIUS,null );
+        }
+        else {
+            g.drawImage(p1_tankImg[dir],x-RADIUS,y-RADIUS,null );
         }
     }
 
@@ -126,8 +137,8 @@ public class Tank {
                 break;
             case DIR_DOWN:
                 y += speed;
-                if(y > Constant.FRAME_HEIGHT - RADIUS*2){
-                    y = Constant.FRAME_HEIGHT - RADIUS*2;
+                if(y > Constant.FRAME_HEIGHT - RADIUS){
+                    y = Constant.FRAME_HEIGHT - RADIUS;
                 }
                 break;
             case DIR_LEFT:
@@ -138,8 +149,8 @@ public class Tank {
                 break;
             case DIR_RIGHT:
                 x += speed;
-                if(x > Constant.FRAME_WIDTH - RADIUS*2){
-                    x = Constant.FRAME_WIDTH - RADIUS*2;
+                if(x > Constant.FRAME_WIDTH - RADIUS){
+                    x = Constant.FRAME_WIDTH - RADIUS;
                 }
                 break;
         }

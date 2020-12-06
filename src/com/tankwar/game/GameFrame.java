@@ -1,11 +1,12 @@
 package com.tankwar.game;
-import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.tankwar.utilis.Constant.*;
 
@@ -20,8 +21,10 @@ public class GameFrame extends Frame implements Runnable{
     private int menuIndex;
     //最上方的高度
     public static int titleBarH;
-    //宣告坦克
-    private Tank my_tank;
+    //宣告友方坦克
+    private Tank Player_Tank_1;
+    //敵人坦克物件池
+    private List<Tank> enemies = new ArrayList<>();
     /**
      *  對視窗進行初始化
      */
@@ -108,8 +111,16 @@ public class GameFrame extends Frame implements Runnable{
         //繪製背景
         g.setColor(Color.BLACK);
         g.fillRect(0,0,FRAME_WIDTH,FRAME_HEIGHT);
+        //繪製敵人坦克
+        drawEnemies(g);
         //繪製坦克
-        my_tank.draw(g);
+        Player_Tank_1.draw(g);
+    }
+    public  void drawEnemies(Graphics g){
+        for (int i = 0; i < enemies.size(); i++) {
+            Tank enemy = enemies.get(i);
+            enemy.draw(g);
+        }
     }
     private void drawOver(Graphics g) {
     }
@@ -194,7 +205,24 @@ public class GameFrame extends Frame implements Runnable{
     private void newGame() {
         gameState = STATE_RUN;
         //繪製坦克
-        my_tank = new Tank(300,400,Tank.DIR_DOWN);
+        Player_Tank_1 = new Tank(300,400,Tank.DIR_DOWN);
+        //產生敵人
+        new Thread(){
+            @Override
+            public void run() {
+                while (true){
+                    if(enemies.size()< ENEMY_MAX_COUNT){
+                        Tank enemy = Tank.createEnemy();
+                        enemies.add(enemy);
+                    }
+                    try {
+                        Thread.sleep(ENEMY_BORN_INTERVAL);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }.start();
     }
 
     private void keyPressedEventHelp(int keyCode) {
@@ -204,23 +232,23 @@ public class GameFrame extends Frame implements Runnable{
     private void keyPressedEventRun(int keyCode) {
         switch (keyCode){
             case KeyEvent.VK_W:
-                my_tank.setDir(Tank.DIR_UP);
-                my_tank.setStatus(Tank.STATE_MOVE);
+                Player_Tank_1.setDir(Tank.DIR_UP);
+                Player_Tank_1.setStatus(Tank.STATE_MOVE);
                 break;
             case KeyEvent.VK_S:
-                my_tank.setDir(Tank.DIR_DOWN);
-                my_tank.setStatus(Tank.STATE_MOVE);
+                Player_Tank_1.setDir(Tank.DIR_DOWN);
+                Player_Tank_1.setStatus(Tank.STATE_MOVE);
                 break;
             case KeyEvent.VK_A:
-                my_tank.setDir(Tank.DIR_LEFT);
-                my_tank.setStatus(Tank.STATE_MOVE);
+                Player_Tank_1.setDir(Tank.DIR_LEFT);
+                Player_Tank_1.setStatus(Tank.STATE_MOVE);
                 break;
             case KeyEvent.VK_D:
-                my_tank.setDir(Tank.DIR_RIGHT);
-                my_tank.setStatus(Tank.STATE_MOVE);
+                Player_Tank_1.setDir(Tank.DIR_RIGHT);
+                Player_Tank_1.setStatus(Tank.STATE_MOVE);
                 break;
             case KeyEvent.VK_SPACE:
-                my_tank.fire();
+                Player_Tank_1.fire();
                 break;
         }
     }
@@ -231,7 +259,7 @@ public class GameFrame extends Frame implements Runnable{
             case KeyEvent.VK_S:
             case KeyEvent.VK_A:
             case KeyEvent.VK_D:
-                my_tank.setStatus(Tank.STATE_STAND);
+                Player_Tank_1.setStatus(Tank.STATE_STAND);
                 break;
         }
     }
