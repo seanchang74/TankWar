@@ -121,6 +121,8 @@ public class GameFrame extends Frame implements Runnable{
         Player_Tank_1.draw(g);
         //碰撞檢測
         bulletCollideTank();
+        //繪製爆炸
+        drawExplodes(g);
     }
     public  void drawEnemies(Graphics g){
         for (int i = 0; i < enemies.size(); i++) {
@@ -297,5 +299,12 @@ public class GameFrame extends Frame implements Runnable{
         for (Tank enemy : enemies) {
             Player_Tank_1.collideBullets(enemy.getBullets());
         }
+    }
+
+    private void drawExplodes(Graphics g){
+        for(Tank enemy : enemies){
+            enemy.drawExplode(g);
+        }
+        Player_Tank_1.drawExplode(g);
     }
 }

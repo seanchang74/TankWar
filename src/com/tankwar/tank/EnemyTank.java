@@ -18,10 +18,10 @@ public class EnemyTank extends Tank{
 
     static { //enemy
         enemy_tankImg = new Image[4];
-        enemy_tankImg[0] = Toolkit.getDefaultToolkit().createImage("res/image/enemy1U.gif");
-        enemy_tankImg[1] = Toolkit.getDefaultToolkit().createImage("res/image/enemy1D.gif");
-        enemy_tankImg[2] = Toolkit.getDefaultToolkit().createImage("res/image/enemy1L.gif");
-        enemy_tankImg[3] = Toolkit.getDefaultToolkit().createImage("res/image/enemy1R.gif");
+        enemy_tankImg[0] = MyUtil.createImage("res/image/enemy1U.gif");
+        enemy_tankImg[1] = MyUtil.createImage("res/image/enemy1D.gif");
+        enemy_tankImg[2] = MyUtil.createImage("res/image/enemy1L.gif");
+        enemy_tankImg[3] = MyUtil.createImage("res/image/enemy1R.gif");
     }
 
     public EnemyTank(int x, int y, int dir){

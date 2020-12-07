@@ -2,6 +2,7 @@ package com.tankwar.tank;
 
 
 import com.tankwar.game.Bullet;
+import com.tankwar.game.Explode;
 import com.tankwar.game.GameFrame;
 import com.tankwar.utilis.BulletsPool;
 import com.tankwar.utilis.Constant;
@@ -46,8 +47,10 @@ public abstract  class Tank {
     private boolean isEnemy = false;
 
 
-    //TODO 砲彈
+    //砲彈容器
     private List<Bullet> bullets = new ArrayList();
+    //爆炸效果容器
+    private List<Explode> explodes = new ArrayList();
 
     public Tank(int x,int y,int dir){
         this.x = x;
@@ -224,13 +227,23 @@ public abstract  class Tank {
     public void collideBullets(List<Bullet> bullets){
         //對所有子彈和坦克進行碰撞檢測
         for(Bullet bullet : bullets){
+            int bulletX = bullet.getX();
+            int bulletY = bullet.getY();
             //碰撞發生
-            if(MyUtil.isCollide(x,y,RADIUS,bullet.getX(),bullet.getY())){
+            if(MyUtil.isCollide(this.x,y,RADIUS,bulletX,bulletY)){
                 //子彈消失
                 bullet.setVisible(false);
                 //坦克受到傷害
                 //添加爆炸效果
+                explodes.add(new Explode(bulletX,bulletY));
             }
+        }
+    }
+
+    //爆炸繪製
+    public void drawExplode(Graphics g ){
+        for(Explode explode:explodes){
+            explode.draw(g);
         }
     }
 }

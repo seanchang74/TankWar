@@ -1,6 +1,14 @@
 package com.tankwar.utilis;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.awt.image.CropImageFilter;
+import java.awt.image.FilteredImageSource;
+import java.awt.image.ImageFilter;
+import java.io.File;
+import java.io.IOException;
+
 
 public class MyUtil {
     private MyUtil(){}
@@ -44,4 +52,24 @@ public class MyUtil {
         }
         else return false;
     }
+
+    /**
+     * 根據位置路徑加載圖片
+     * @param path 圖片資源路徑
+     * @return
+     */
+    public static final Image createImage(String path){
+        return Toolkit.getDefaultToolkit().createImage(path);
+    }
+
+//    public static final Image createImage(String path){
+//        Image image = Toolkit.getDefaultToolkit().createImage(path);
+////        final BufferedImage srcImage = getValidSrcImg();
+//        final ImageFilter cropFilter = new CropImageFilter(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
+//        final Image image = Toolkit.getDefaultToolkit().createImage(new FilteredImageSource(srcImage.getSource(), cropFilter));
+//        this.targetImage = ImageUtil.toBufferedImage(image);
+//
+//        System.out.println("success");
+//        return image;
+//    }
 }
