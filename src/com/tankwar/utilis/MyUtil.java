@@ -62,14 +62,4 @@ public class MyUtil {
         return Toolkit.getDefaultToolkit().createImage(path);
     }
 
-//    public static final Image createImage(String path){
-//        Image image = Toolkit.getDefaultToolkit().createImage(path);
-////        final BufferedImage srcImage = getValidSrcImg();
-//        final ImageFilter cropFilter = new CropImageFilter(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
-//        final Image image = Toolkit.getDefaultToolkit().createImage(new FilteredImageSource(srcImage.getSource(), cropFilter));
-//        this.targetImage = ImageUtil.toBufferedImage(image);
-//
-//        System.out.println("success");
-//        return image;
-//    }
 }

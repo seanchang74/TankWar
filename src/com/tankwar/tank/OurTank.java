@@ -32,7 +32,10 @@ public class OurTank extends Tank{
         super(x,y,dir);
     }
 
-    public void drawTank(Graphics g){
+    public void drawTank(Graphics g,int player){
+        if(player == 1)
         g.drawImage(p1_tankImg[getDir()],getX()-RADIUS,getY()-RADIUS,null );
+        else if(player == 2)
+        g.drawImage(p2_tankImg[getDir()],getX()-RADIUS,getY()-RADIUS,null );
     }
 }

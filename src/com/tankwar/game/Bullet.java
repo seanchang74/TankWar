@@ -9,15 +9,16 @@ import java.awt.*;
  */
 public class Bullet {
     //子彈速度為坦克速度2倍
-    public static final int DEFAULT_SPEED = Tank.DEFAULT_SPEED << 1;
+    public static final float DEFAULT_SPEED = Tank.DEFAULT_SPEED*2.5f;
 
     public static final int RADIUS = 4;
 
     private int x,y;
-    private int speed = DEFAULT_SPEED;
+    private float speed = DEFAULT_SPEED;
     private int dir;
     private int atk;
-    private Color color = Color.ORANGE;
+    private Color colorOrange = Color.ORANGE;
+    private Color colorGreen = Color.decode("#7fe78b");
     //子彈是否可見
     private boolean visible = true;
 
@@ -35,10 +36,13 @@ public class Bullet {
      * 繪製砲彈
      * @param g
      */
-    public void draw(Graphics g){
+    public void draw(Graphics g ,int player){
         if(!visible)return;
         logic();
-        g.setColor(color);
+        if(player == 1){
+        g.setColor(colorOrange);}
+        else if(player == 2)g.setColor(colorGreen);
+        else g.setColor(Color.WHITE);
         g.fillOval(x-RADIUS,y-RADIUS,RADIUS<<1,RADIUS<<1);
     }
 
@@ -86,7 +90,7 @@ public class Bullet {
         this.y = y;
     }
 
-    public int getSpeed() {
+    public float getSpeed() {
         return speed;
     }
 

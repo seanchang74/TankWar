@@ -5,50 +5,84 @@ import com.tankwar.utilis.MyUtil;
 import java.awt.*;
 
 /**
- * 控制爆炸效果
+ * 用來控制爆炸效果的類
  */
 public class Explode {
-    public static final int EXPLODE_FRAME_COUNT = 16;
-    //爆炸圖片
+    public static final int EXPLODE_FRAME_COUNT = 8;
     private static Image[] img;
-    private static int explodeWidth;
-    private static int explodeHeight;
+    //爆炸效果的圖片的寬度和高度
+    private static int explodewidth;
+    private static int explodeheight;
     static {
         img = new Image[EXPLODE_FRAME_COUNT];
-        for (int i = 1;i < 9;i++){
-
-            System.out.println("A");
-            img[i] = MyUtil.createImage("res/image/blast"+i+".gif");
+        for (int i = 0; i < img.length; i++) {
+            img[i] = MyUtil.createImage("res/image/blast"+(i+1)+".gif");
         }
     }
-
-    //爆炸效果繪製
+    //爆炸效果的屬性
     private int x,y;
-    //當前播放的禎數範圍
+    //當前播放的偵的索引
     private int index;
-    //是否可見
+    //
     private boolean visible = true;
 
-
-    public Explode(int x,int y){
-        this.x = x;
-        this.y = y;
-        index = 1;
-
+    public Explode() {
+        index = 0;
     }
 
-    //todo 爆炸位置要再修正
+    public Explode(int x, int y) {
+        this.x = x;
+        this.y = y;
+        index = 0;
+    }
+
+    /**
+     *
+     * @param g
+     */
     public void draw(Graphics g){
-        if(explodeHeight <= 0){
-//            explodeWidth = img[0].getWidth(null)/2;
-//            explodeHeight = img[0].getHeight(null);
+        //對爆炸效果圖片的寬高的確定
+        if(explodeheight <= 0){
+            explodeheight = img[0].getHeight(null);
+            explodewidth = img[0].getWidth(null);
         }
-        if(!visible)return;
-        g.drawImage(img[index/2],x,y,null );
-//        g.drawImage(img[index/2],x-explodeWidth,y-explodeHeight,null );
-        index++;
+        if(!visible) return;
+        g.drawImage(img[index],x-explodewidth,y-explodeheight,null);
+        index ++;
         if(index >= EXPLODE_FRAME_COUNT){
             visible = false;
         }
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public void setX(int x) {
+        this.x = x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    public void setY(int y) {
+        this.y = y;
+    }
+
+    public int getIndex() {
+        return index;
+    }
+
+    public void setIndex(int index) {
+        this.index = index;
+    }
+
+    public boolean isVisible() {
+        return visible;
+    }
+
+    public void setVisible(boolean visible) {
+        this.visible = visible;
     }
 }
