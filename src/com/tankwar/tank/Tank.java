@@ -2,14 +2,14 @@ package com.tankwar.tank;
 
 
 import com.tankwar.game.Bullet;
+import com.tankwar.game.Explode;
 import com.tankwar.game.GameFrame;
 import com.tankwar.utilis.BulletsPool;
+import com.tankwar.utilis.ExplodesPool;
 import com.tankwar.utilis.Constant;
 import com.tankwar.utilis.MyUtil;
 
-import javax.swing.*;
 import java.awt.*;
-import java.lang.invoke.SwitchPoint;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,8 +46,10 @@ public abstract  class Tank {
     private boolean isEnemy = false;
 
 
-    //TODO 砲彈
+    //砲彈容器
     private List<Bullet> bullets = new ArrayList();
+    //爆炸效果容器
+    private List<Explode> explodes = new ArrayList();
 
     public Tank(int x,int y,int dir){
         this.x = x;
@@ -57,19 +59,19 @@ public abstract  class Tank {
     }
 
 
-    public void draw(Graphics g){
+    public void draw(Graphics g,int player){
         /**
          * 每楨都要執行
          */
         logic();
-        drawTank(g);
-        drawBullets(g);
+        drawTank(g,player);
+        drawBullets(g,player);
     }
     /**
      * 繪製坦克
      * @param g
      */
-    public abstract void drawTank(Graphics g);
+    public abstract void drawTank(Graphics g,int player);
 
     //坦克邏輯處理
     private void logic(){
@@ -207,14 +209,15 @@ public abstract  class Tank {
      * 繪製坦克的子彈
      * @param g
      */
-    private void drawBullets(Graphics g){
+    private void drawBullets(Graphics g,int player){
         for (Bullet bullet: bullets){
-            bullet.draw(g);
+            bullet.draw(g,player);
         }
         for (int i=0;i<bullets.size();i++){
             Bullet bullet = bullets.get(i);
             if(!bullet.isVisible()){
                 Bullet remove = bullets.remove(i);
+                i--;
                 BulletsPool.theReturn(remove);
             }
         }
@@ -224,12 +227,39 @@ public abstract  class Tank {
     public void collideBullets(List<Bullet> bullets){
         //對所有子彈和坦克進行碰撞檢測
         for(Bullet bullet : bullets){
+            int bulletX = bullet.getX();
+            int bulletY = bullet.getY();
             //碰撞發生
-            if(MyUtil.isCollide(x,y,RADIUS,bullet.getX(),bullet.getY())){
+            if(MyUtil.isCollide(this.x, this.y,RADIUS,bulletX,bulletY)){
                 //子彈消失
                 bullet.setVisible(false);
                 //坦克受到傷害
-                //添加爆炸效果
+                //添加爆炸效果，以及當前被擊中坦克的座標
+                Explode explode = ExplodesPool.get();
+                explode.setX(x+RADIUS*2);
+                explode.setY(y+RADIUS*2);
+                explode.setVisible(true);
+                explode.setIndex(0);
+                explodes.add(explode);
+            }
+        }
+    }
+
+    /**
+     * 繪製當前坦克上所有的爆炸效果
+     * @param g
+     */
+    public void drawExplode(Graphics g){
+        for (Explode explode : explodes) {
+            explode.draw(g);
+        }
+//        將不可見的爆炸效果刪除
+        for (int i = 0; i < explodes.size(); i++) {
+            Explode explode = explodes.get(i);
+            if(!explode.isVisible()){
+                Explode remove = explodes.remove(i);
+                ExplodesPool.back(remove);
+                i--;
             }
         }
     }
