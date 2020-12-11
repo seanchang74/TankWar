@@ -60,19 +60,19 @@ public abstract  class Tank {
     }
 
 
-    public void draw(Graphics g){
+    public void draw(Graphics g,int player){
         /**
          * 每楨都要執行
          */
         logic();
-        drawTank(g);
-        drawBullets(g);
+        drawTank(g,player);
+        drawBullets(g,player);
     }
     /**
      * 繪製坦克
      * @param g
      */
-    public abstract void drawTank(Graphics g);
+    public abstract void drawTank(Graphics g,int player);
 
     //坦克邏輯處理
     private void logic(){
@@ -210,9 +210,9 @@ public abstract  class Tank {
      * 繪製坦克的子彈
      * @param g
      */
-    private void drawBullets(Graphics g){
+    private void drawBullets(Graphics g,int player){
         for (Bullet bullet: bullets){
-            bullet.draw(g);
+            bullet.draw(g,player);
         }
         for (int i=0;i<bullets.size();i++){
             Bullet bullet = bullets.get(i);

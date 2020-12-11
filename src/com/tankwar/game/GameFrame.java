@@ -2,6 +2,7 @@ package com.tankwar.game;
 import com.tankwar.tank.EnemyTank;
 import com.tankwar.tank.OurTank;
 import com.tankwar.tank.Tank;
+import com.tankwar.utilis.MyUtil;
 
 import java.awt.*;
 import java.awt.event.KeyAdapter;
@@ -27,8 +28,11 @@ public class GameFrame extends Frame implements Runnable{
     public static int titleBarH;
     //宣告友方坦克
     private Tank Player_Tank_1;
+    private Tank Player_Tank_2;
     //敵人坦克物件池
     private List<Tank> enemies = new ArrayList<>();
+    //菜單指標
+    private static Image select_image = MyUtil.createImage("res/image/selecttank.gif");
     /**
      *  對視窗進行初始化
      */
@@ -101,10 +105,15 @@ public class GameFrame extends Frame implements Runnable{
         final int STR_WIDTH = 120;
         int x = FRAME_WIDTH - STR_WIDTH >>1;
         int y = FRAME_HEIGHT /3*2;
-        final int DIS = 30;
+        final int DIS = 35;
         g.setColor(Color.WHITE);
         for (int i = 0; i < MENUS.length; i++) {
-            if(i == menuIndex)g.setColor(Color.RED);
+            //紅色菜單
+            if(i == menuIndex){
+                g.setColor(Color.RED);
+                //指標圖片
+                g.drawImage(select_image,x-50,y-25+DIS * i,40,36,null);
+            }
             else g.setColor(Color.WHITE);
             g.drawString(MENUS[i],x,y+DIS * i);
         }
@@ -118,7 +127,8 @@ public class GameFrame extends Frame implements Runnable{
         //繪製敵人坦克
         drawEnemies(g);
         //繪製坦克
-        Player_Tank_1.draw(g);
+        Player_Tank_1.draw(g,1);
+        Player_Tank_2.draw(g,2);
         //碰撞檢測
         bulletCollideTank();
         //繪製爆炸
@@ -127,7 +137,7 @@ public class GameFrame extends Frame implements Runnable{
     public  void drawEnemies(Graphics g){
         for (int i = 0; i < enemies.size(); i++) {
             Tank enemy = enemies.get(i);
-            enemy.draw(g);
+            enemy.draw(g,0);
         }
     }
     private void drawOver(Graphics g) {
@@ -201,8 +211,10 @@ public class GameFrame extends Frame implements Runnable{
             case KeyEvent.VK_ENTER:{
                 //TODO
                 //開始新遊戲
-                newGame();
-                break;
+                if(menuIndex == 0) {
+                    newGame();
+                    break;
+                }
             }
         }
     }
@@ -214,6 +226,7 @@ public class GameFrame extends Frame implements Runnable{
         gameState = STATE_RUN;
         //繪製坦克
         Player_Tank_1 = new OurTank(300,400,Tank.DIR_DOWN);
+        Player_Tank_2 = new OurTank(600,400,Tank.DIR_DOWN);
         //產生敵人
         new Thread(){
             @Override
@@ -239,6 +252,7 @@ public class GameFrame extends Frame implements Runnable{
 
     private void keyPressedEventRun(int keyCode) {
         switch (keyCode){
+            //玩家1
             case KeyEvent.VK_W:
                 Player_Tank_1.setDir(Tank.DIR_UP);
                 Player_Tank_1.setStatus(Tank.STATE_MOVE);
@@ -258,16 +272,45 @@ public class GameFrame extends Frame implements Runnable{
             case KeyEvent.VK_SPACE:
                 Player_Tank_1.fire();
                 break;
+
+            //玩家2
+            case KeyEvent.VK_UP:
+                Player_Tank_2.setDir(Tank.DIR_UP);
+                Player_Tank_2.setStatus(Tank.STATE_MOVE);
+                break;
+            case KeyEvent.VK_DOWN:
+                Player_Tank_2.setDir(Tank.DIR_DOWN);
+                Player_Tank_2.setStatus(Tank.STATE_MOVE);
+                break;
+            case KeyEvent.VK_LEFT:
+                Player_Tank_2.setDir(Tank.DIR_LEFT);
+                Player_Tank_2.setStatus(Tank.STATE_MOVE);
+                break;
+            case KeyEvent.VK_RIGHT:
+                Player_Tank_2.setDir(Tank.DIR_RIGHT);
+                Player_Tank_2.setStatus(Tank.STATE_MOVE);
+                break;
+            case KeyEvent.VK_ENTER:
+                Player_Tank_2.fire();
+                break;
         }
     }
     //按鍵被鬆開的處理
     private void keyReleasedEventRun(int keyCode) {
         switch (keyCode){
+            //玩家1
             case KeyEvent.VK_W:
             case KeyEvent.VK_S:
             case KeyEvent.VK_A:
             case KeyEvent.VK_D:
                 Player_Tank_1.setStatus(Tank.STATE_STAND);
+                break;
+            //玩家2
+            case KeyEvent.VK_UP:
+            case KeyEvent.VK_DOWN:
+            case KeyEvent.VK_LEFT:
+            case KeyEvent.VK_RIGHT:
+                Player_Tank_2.setStatus(Tank.STATE_STAND);
                 break;
         }
     }
@@ -299,6 +342,12 @@ public class GameFrame extends Frame implements Runnable{
         for (Tank enemy : enemies) {
             Player_Tank_1.collideBullets(enemy.getBullets());
         }
+        for(Tank enemy : enemies){
+            enemy.collideBullets(Player_Tank_2.getBullets());
+        }
+        for (Tank enemy : enemies) {
+            Player_Tank_2.collideBullets(enemy.getBullets());
+        }
     }
 
     private void drawExplodes(Graphics g){
@@ -306,5 +355,6 @@ public class GameFrame extends Frame implements Runnable{
             enemy.drawExplode(g);
         }
         Player_Tank_1.drawExplode(g);
+        Player_Tank_2.drawExplode(g);
     }
 }

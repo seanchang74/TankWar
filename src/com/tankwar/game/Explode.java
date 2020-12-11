@@ -40,8 +40,6 @@ public class Explode {
     //todo 爆炸位置要再修正
     public void draw(Graphics g){
         if(explodeHeight <= 0){
-//            explodeWidth = img[0].getWidth(null)/2;
-//            explodeHeight = img[0].getHeight(null);
         }
         if(!visible)return;
         g.drawImage(img[index/2],x,y,null );

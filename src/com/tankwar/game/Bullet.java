@@ -17,7 +17,8 @@ public class Bullet {
     private int speed = DEFAULT_SPEED;
     private int dir;
     private int atk;
-    private Color color = Color.ORANGE;
+    private Color colorOrange = Color.ORANGE;
+    private Color colorGreen = Color.decode("#7fe78b");
     //子彈是否可見
     private boolean visible = true;
 
@@ -35,10 +36,12 @@ public class Bullet {
      * 繪製砲彈
      * @param g
      */
-    public void draw(Graphics g){
+    public void draw(Graphics g ,int player){
         if(!visible)return;
         logic();
-        g.setColor(color);
+        if(player == 1){
+        g.setColor(colorOrange);}
+        else if(player == 2)g.setColor(colorGreen);
         g.fillOval(x-RADIUS,y-RADIUS,RADIUS<<1,RADIUS<<1);
     }
 

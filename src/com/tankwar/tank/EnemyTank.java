@@ -40,7 +40,7 @@ public class EnemyTank extends Tank{
         return enemy;
     }
 
-    public void drawTank(Graphics g){
+    public void drawTank(Graphics g,int player){
         ai();
         g.drawImage(enemy_tankImg[getDir()],getX()-RADIUS,getY()-RADIUS,null );
    }
