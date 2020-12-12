@@ -4,6 +4,7 @@ import com.tankwar.tank.OurTank;
 import com.tankwar.tank.Tank;
 import com.tankwar.utilis.MyUtil;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -33,6 +34,7 @@ public class GameFrame extends Frame implements Runnable{
     private List<Tank> enemies = new ArrayList<>();
     //菜單指標
     private static Image select_image = MyUtil.createImage("res/image/selecttank.gif");
+
     /**
      *  對視窗進行初始化
      */
@@ -41,6 +43,8 @@ public class GameFrame extends Frame implements Runnable{
         initEventListener();
         new Thread(this).start();
     }
+    //icon
+    ImageIcon icon = new ImageIcon("res/image/enemy3U.gif");
     /**
      * 遊戲狀態初始化
      */
@@ -53,6 +57,8 @@ public class GameFrame extends Frame implements Runnable{
     private void initFrame(){
         //設定標題
         setTitle(GAME_TITLE);
+        //設定圖示
+        setIconImage(icon.getImage());
         //設定視窗大小
         setSize(FRAME_WIDTH,FRAME_HEIGHT);
         //不可縮放
@@ -135,11 +141,18 @@ public class GameFrame extends Frame implements Runnable{
         //繪製爆炸
         drawExplodes(g);
     }
-    public  void drawEnemies(Graphics g){
+    //繪製敵人坦克，若已經死亡從中移除
+    private  void drawEnemies(Graphics g){
         for (int i = 0; i < enemies.size(); i++) {
             Tank enemy = enemies.get(i);
+            if(enemy.isDie()){
+                enemies.remove(i);
+                i--;
+                continue;
+            }
             enemy.draw(g,0);
         }
+        System.out.println("敵人數量"+enemies.size());
     }
     private void drawOver(Graphics g) {
     }

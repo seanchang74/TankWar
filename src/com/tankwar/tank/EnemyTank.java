@@ -2,6 +2,7 @@ package com.tankwar.tank;
 
 import com.tankwar.game.GameFrame;
 import com.tankwar.utilis.Constant;
+import com.tankwar.utilis.EnemyTanksPool;
 import com.tankwar.utilis.MyUtil;
 
 import java.awt.*;
@@ -12,19 +13,29 @@ import java.awt.*;
 
 public class EnemyTank extends Tank{
     //坦克圖片定義
-    private static Image[] enemy_tankImg;
+    private static Image[] enemy_tankImg_hp1;
+    private static Image[] enemy_tankImg_hp2;
     //紀錄時間
     private long aiTime;
 
     static { //enemy
-        enemy_tankImg = new Image[4];
-        enemy_tankImg[0] = MyUtil.createImage("res/image/enemy1U.gif");
-        enemy_tankImg[1] = MyUtil.createImage("res/image/enemy1D.gif");
-        enemy_tankImg[2] = MyUtil.createImage("res/image/enemy1L.gif");
-        enemy_tankImg[3] = MyUtil.createImage("res/image/enemy1R.gif");
+        enemy_tankImg_hp1 = new Image[4];
+        enemy_tankImg_hp1[0] = MyUtil.createImage("res/image/enemy1U.gif");
+        enemy_tankImg_hp1[1] = MyUtil.createImage("res/image/enemy1D.gif");
+        enemy_tankImg_hp1[2] = MyUtil.createImage("res/image/enemy1L.gif");
+        enemy_tankImg_hp1[3] = MyUtil.createImage("res/image/enemy1R.gif");
     }
-
-    public EnemyTank(int x, int y, int dir){
+    static { //enemy
+        enemy_tankImg_hp2 = new Image[4];
+        enemy_tankImg_hp2[0] = MyUtil.createImage("res/image/enemy2U.gif");
+        enemy_tankImg_hp2[1] = MyUtil.createImage("res/image/enemy2D.gif");
+        enemy_tankImg_hp2[2] = MyUtil.createImage("res/image/enemy2L.gif");
+        enemy_tankImg_hp2[3] = MyUtil.createImage("res/image/enemy2R.gif");
+    }
+    public EnemyTank(){
+        aiTime = System.currentTimeMillis();
+    }
+    private EnemyTank(int x, int y, int dir){
         super(x,y,dir);
         aiTime = System.currentTimeMillis();
     }
@@ -33,16 +44,32 @@ public class EnemyTank extends Tank{
         int x = MyUtil.getRandomNumber(0,2) == 0?RADIUS : Constant.FRAME_WIDTH-RADIUS;
         int y = GameFrame.titleBarH +RADIUS;
         int dir = DIR_DOWN;
-        Tank enemy = new EnemyTank(x, y, dir);
+        //使用敵人坦克物件池
+        Tank enemy = EnemyTanksPool.get();
+        enemy.setX(x);
+        enemy.setY(y);
+        enemy.setDir(dir);
         enemy.setEnemy(true);
-        //TODO
         enemy.setStatus(STATE_MOVE);
         return enemy;
     }
 
     public void drawTank(Graphics g,int player){
         ai();
-        g.drawImage(enemy_tankImg[getDir()],getX()-RADIUS,getY()-RADIUS,null );
+        switch (getEnemyhp()){
+            case 1:
+                g.drawImage(enemy_tankImg_hp1[getDir()],getX()-RADIUS,getY()-RADIUS,null );
+                break;
+            case 2:
+                g.drawImage(enemy_tankImg_hp2[getDir()],getX()-RADIUS,getY()-RADIUS,null );
+                break;
+            case 3:
+                g.drawImage(enemy_tankImg_hp2[getDir()],getX()-RADIUS,getY()-RADIUS,null );
+                break;
+            case 4:
+                g.drawImage(enemy_tankImg_hp2[getDir()],getX()-RADIUS,getY()-RADIUS,null );
+                break;
+        }
    }
 
    //敵人AI
