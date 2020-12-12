@@ -33,6 +33,9 @@ public abstract  class Tank {
     public static final int STATE_MOVE = 1;
     public static final int STATE_DIE = 2;
     //坦克初始血量
+    public static final int ATK_MAX = 1;
+    //坦克名字
+    private String name;
     public static final int DEFAULT_HP = 5;
     //敵人坦克血量
     public static final int ENEMY_MIN_HP = 1;
@@ -40,7 +43,6 @@ public abstract  class Tank {
     //坦克攻擊力
     public static final int ATK_MIN = 1;
     public static final int ATK_MAX = 1;
-
 
     //座標
     private int x,y;
@@ -83,7 +85,15 @@ public abstract  class Tank {
         logic();
         drawTank(g,player);
         drawBullets(g,player);
+        drawName(g);
     }
+
+    private void drawName(Graphics g) {
+        g.setColor(color);
+        g.setFont(Constant.NAME_FONT);
+        g.drawString(name,x - RADIUS,y-35);
+    }
+
     /**
      * 繪製坦克
      * @param g

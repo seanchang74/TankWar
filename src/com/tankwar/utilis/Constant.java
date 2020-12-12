@@ -39,6 +39,7 @@ public class Constant {
     };
     // 字體設定
     public  static final Font FONT = new Font("微軟正黑體",Font.BOLD,20);
+    public  static final Font NAME_FONT = new Font("微軟正黑體",Font.BOLD,15);
 
     //螢幕刷新
     public static final int REPAINT_INT = 30;
