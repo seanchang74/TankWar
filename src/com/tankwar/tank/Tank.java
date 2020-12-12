@@ -33,7 +33,8 @@ public abstract  class Tank {
     public static final int STATE_DIE = 2;
     //坦克初始血量
     public static final int DEFAULT_HP = 1000;
-
+    //坦克名字
+    private String name;
 
     //座標
     private int x,y;
@@ -56,6 +57,7 @@ public abstract  class Tank {
         this.y = y;
         this.dir = dir;
         color = MyUtil.getRandomColor();
+        name = MyUtil.getRandomName();
     }
 
 
@@ -66,7 +68,15 @@ public abstract  class Tank {
         logic();
         drawTank(g,player);
         drawBullets(g,player);
+        drawName(g);
     }
+
+    private void drawName(Graphics g) {
+        g.setColor(color);
+        g.setFont(Constant.NAME_FONT);
+        g.drawString(name,x - RADIUS,y-35);
+    }
+
     /**
      * 繪製坦克
      * @param g
