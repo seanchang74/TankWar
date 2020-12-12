@@ -5,6 +5,7 @@ import com.tankwar.game.Bullet;
 import com.tankwar.game.Explode;
 import com.tankwar.game.GameFrame;
 import com.tankwar.utilis.BulletsPool;
+import com.tankwar.utilis.EnemyTanksPool;
 import com.tankwar.utilis.ExplodesPool;
 import com.tankwar.utilis.Constant;
 import com.tankwar.utilis.MyUtil;
@@ -31,14 +32,21 @@ public abstract  class Tank {
     public static final int STATE_STAND = 0;
     public static final int STATE_MOVE = 1;
     public static final int STATE_DIE = 2;
-    //坦克初始血量
-    public static final int DEFAULT_HP = 1000;
+    //坦克初始血量 TODO
+    public static final int DEFAULT_HP = 5;
+    //敵人坦克血量
+    public static final int ENEMY_MIN_HP = 1;
+    public static final int ENEMY_MAX_HP = 3;
+    //坦克攻擊力
+    public static final int ATK_MIN = 1;
+    public static final int ATK_MAX = 1;
 
 
     //座標
     private int x,y;
     private int atk;
     private int hp = DEFAULT_HP;
+    private int enemyhp = MyUtil.getRandomNumber(ENEMY_MIN_HP,ENEMY_MAX_HP);
     private int speed = DEFAULT_SPEED;
     private int dir;
     private int status = STATE_STAND;
@@ -51,11 +59,20 @@ public abstract  class Tank {
     //爆炸效果容器
     private List<Explode> explodes = new ArrayList();
 
+    //給物件池用
+    public Tank(){
+        initTank();
+    };
     public Tank(int x,int y,int dir){
         this.x = x;
         this.y = y;
         this.dir = dir;
+        initTank();
+    }
+
+    private void initTank(){
         color = MyUtil.getRandomColor();
+        atk = MyUtil.getRandomNumber(ATK_MIN,ATK_MAX);
     }
 
 
@@ -190,6 +207,14 @@ public abstract  class Tank {
         isEnemy = enemy;
     }
 
+    public int getEnemyhp() {
+        return enemyhp;
+    }
+
+    public void setEnemyhp(int enemyhp) {
+        this.enemyhp = enemyhp;
+    }
+
     /**
      * 坦克開火
      */
@@ -234,6 +259,7 @@ public abstract  class Tank {
                 //子彈消失
                 bullet.setVisible(false);
                 //坦克受到傷害
+                hurt(bullet);
                 //添加爆炸效果，以及當前被擊中坦克的座標
                 Explode explode = ExplodesPool.get();
                 explode.setX(x+RADIUS*2);
@@ -243,6 +269,38 @@ public abstract  class Tank {
                 explodes.add(explode);
             }
         }
+    }
+    //坦克受傷
+    private void hurt(Bullet bullet){
+        int atk = bullet.getAtk();
+        hp-=atk;
+        if(hp < 0){
+            hp = 0;
+            die();
+        }
+        if(isEnemy){
+            enemyhp-=atk;
+            if(enemyhp < 0){
+                hp =0;
+                die();
+            }
+        }
+    }
+
+    private void die(){
+        //敵人死了
+        if(isEnemy){
+            //歸還物件池
+            EnemyTanksPool.theReturn(this);
+        }
+        else{//TODO
+            //gameover
+
+        }
+    }
+
+    public boolean isDie(){
+        return enemyhp<=0;
     }
 
     /**
@@ -262,5 +320,8 @@ public abstract  class Tank {
                 i--;
             }
         }
+    }
+
+    private class life{
     }
 }
