@@ -2,7 +2,6 @@ package com.tankwar.utilis;
 
 import com.tankwar.game.Bullet;
 
-import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.List;
 

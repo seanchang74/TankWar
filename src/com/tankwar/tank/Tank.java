@@ -32,7 +32,7 @@ public abstract  class Tank {
     public static final int STATE_STAND = 0;
     public static final int STATE_MOVE = 1;
     public static final int STATE_DIE = 2;
-    //坦克初始血量 TODO
+    //坦克初始血量
     public static final int DEFAULT_HP = 5;
     //敵人坦克血量
     public static final int ENEMY_MIN_HP = 1;
@@ -247,7 +247,12 @@ public abstract  class Tank {
             }
         }
     }
-
+    //reset時子彈清空
+    public void  bulletsReturn(){
+        for (Bullet bullet : bullets) {
+            BulletsPool.theReturn(bullet);
+        }
+    }
     //坦克和子彈碰撞判斷
     public void collideBullets(List<Bullet> bullets){
         //對所有子彈和坦克進行碰撞檢測
@@ -274,13 +279,13 @@ public abstract  class Tank {
     private void hurt(Bullet bullet){
         int atk = bullet.getAtk();
         hp-=atk;
-        if(hp < 0){
+        if(hp <= 0){
             hp = 0;
             die();
         }
         if(isEnemy){
             enemyhp-=atk;
-            if(enemyhp < 0){
+            if(enemyhp <= 0){
                 hp =0;
                 die();
             }
@@ -295,6 +300,7 @@ public abstract  class Tank {
         }
         else{//TODO
             //gameover
+            GameFrame.setGameState(Constant.STATE_OVER);
 
         }
     }

@@ -32,6 +32,11 @@ public class Constant {
             "關於",
             "退出遊戲",
     };
+
+    public  static final String[] OVER_STR = {
+            "退出遊戲",
+            "返回標題",
+    };
     // 字體設定
     public  static final Font FONT = new Font("微軟正黑體",Font.BOLD,20);
 

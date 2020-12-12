@@ -2,6 +2,7 @@ package com.tankwar.game;
 import com.tankwar.tank.EnemyTank;
 import com.tankwar.tank.OurTank;
 import com.tankwar.tank.Tank;
+import com.tankwar.utilis.Constant;
 import com.tankwar.utilis.MyUtil;
 
 import javax.swing.*;
@@ -22,7 +23,7 @@ public class GameFrame extends Frame implements Runnable{
     //雙緩衝用圖片
     private BufferedImage bufImg = new BufferedImage(FRAME_WIDTH,FRAME_HEIGHT,BufferedImage.TYPE_4BYTE_ABGR);
     //遊戲狀態
-    public static int gameState;
+    private static int gameState;
     //菜單被選
     private int menuIndex;
     //最上方的高度
@@ -34,17 +35,19 @@ public class GameFrame extends Frame implements Runnable{
     private List<Tank> enemies = new ArrayList<>();
     //菜單指標
     private static Image select_image = MyUtil.createImage("res/image/selecttank.gif");
-
+    //icon
+    private static ImageIcon icon = new ImageIcon("res/image/enemy3U.gif");
+    //結束遊戲圖片
+    private static Image overImg = MyUtil.createImage("res/image/over.gif");
     /**
      *  對視窗進行初始化
      */
     public  GameFrame(){
         initFrame();
+        initGame();
         initEventListener();
         new Thread(this).start();
     }
-    //icon
-    ImageIcon icon = new ImageIcon("res/image/enemy3U.gif");
     /**
      * 遊戲狀態初始化
      */
@@ -154,7 +157,30 @@ public class GameFrame extends Frame implements Runnable{
         }
         System.out.println("敵人數量"+enemies.size());
     }
+
+    /**
+     * 繪製遊戲結束 TODO
+     * @param g
+     */
     private void drawOver(Graphics g) {
+        int imgW = overImg.getWidth(null);
+        int imgH = overImg.getHeight(null);
+        int imgX = FRAME_WIDTH - imgW >>1;
+        int imgY = FRAME_HEIGHT - imgH >>1;
+        final int DIS = 140;
+        g.setColor(Color.BLACK);
+        g.fillRect(0,0,FRAME_WIDTH,FRAME_HEIGHT);
+        g.drawImage(overImg, imgX, imgY, null);
+
+        //提供選單
+        for (int i = 0; i < OVER_STR.length; i++) {
+            //紅色菜單
+            if(i == menuIndex){
+                g.setColor(Color.RED);
+            }
+            else g.setColor(Color.WHITE);
+            g.drawString(OVER_STR[i], imgX-67+DIS*i,imgY+90 );
+        }
     }
 
 
@@ -256,6 +282,10 @@ public class GameFrame extends Frame implements Runnable{
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
+                    //只在遊戲進行中創建敵人
+                    if(gameState != STATE_RUN){
+                        break;
+                    }
                 }
             }
         }.start();
@@ -330,8 +360,57 @@ public class GameFrame extends Frame implements Runnable{
         }
     }
 
+    /**
+     * 遊戲結束按鍵處理 TODO
+     * @param keyCode
+     */
     private void keyPressedEventOver(int keyCode) {
-
+        switch (keyCode){
+            case KeyEvent.VK_LEFT:
+            case KeyEvent.VK_A:
+                if(--menuIndex<0){
+                    menuIndex=0;
+                }
+                break;
+            case KeyEvent.VK_RIGHT:
+            case KeyEvent.VK_D:
+                System.out.println("d");
+                if(++menuIndex>1){
+                    menuIndex=1;
+                }
+                break;
+            case KeyEvent.VK_ENTER:{
+                //TODO
+                //結束遊戲
+                if(menuIndex == 0) {
+                    System.exit(0);
+                }
+                //回到標題
+                else if(menuIndex == 1){
+                    gameState =  STATE_MENU;
+                    //重製遊戲
+                    resetGame();
+                }
+                break;
+            }
+        }
+    }
+    //重置遊戲狀態
+    private void resetGame(){
+        menuIndex = 0;
+        //將子彈還回對象池
+        Player_Tank_1.bulletsReturn();
+        if(Player_Tank_2!=null)
+        Player_Tank_2.bulletsReturn();
+        //刪除自己坦克
+        Player_Tank_1 = null;
+        if(Player_Tank_2!=null)
+        Player_Tank_2 = null;
+        //清空敵人物件池和子彈
+        for (Tank enemy : enemies) {
+            enemy.bulletsReturn();
+        }
+        enemies.clear();
     }
 
 
@@ -375,5 +454,13 @@ public class GameFrame extends Frame implements Runnable{
         Player_Tank_1.drawExplode(g);
         if(menuIndex ==1)
         Player_Tank_2.drawExplode(g);
+    }
+
+    public static int getGameState() {
+        return gameState;
+    }
+
+    public static void setGameState(int gameState) {
+        GameFrame.gameState = gameState;
     }
 }
