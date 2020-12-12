@@ -83,6 +83,7 @@ public abstract  class Tank {
         logic();
         drawTank(g,player);
         drawBullets(g,player);
+
     }
     /**
      * 繪製坦克
