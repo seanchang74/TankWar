@@ -85,15 +85,8 @@ public abstract  class Tank {
         logic();
         drawTank(g,player);
         drawBullets(g,player);
-        drawName(g);
-    }
 
-    private void drawName(Graphics g) {
-        g.setColor(color);
-        g.setFont(Constant.NAME_FONT);
-        g.drawString(name,x - RADIUS,y-35);
     }
-
     /**
      * 繪製坦克
      * @param g

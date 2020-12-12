@@ -1,4 +1,5 @@
 package com.tankwar.game;
+import com.tankwar.map.GameMap;
 import com.tankwar.tank.EnemyTank;
 import com.tankwar.tank.OurTank;
 import com.tankwar.tank.Tank;
@@ -39,6 +40,9 @@ public class GameFrame extends Frame implements Runnable{
     private static ImageIcon icon = new ImageIcon("res/image/enemy3U.gif");
     //結束遊戲圖片
     private static Image overImg = MyUtil.createImage("res/image/over.gif");
+
+    //定義地圖相關的內容
+    private GameMap gameMap;
     /**
      *  對視窗進行初始化
      */
@@ -133,6 +137,10 @@ public class GameFrame extends Frame implements Runnable{
         //繪製背景
         g.setColor(Color.BLACK);
         g.fillRect(0,0,FRAME_WIDTH,FRAME_HEIGHT);
+
+        //繪製地圖
+        gameMap.draw(g);
+
         //繪製敵人坦克
         drawEnemies(g);
         //繪製坦克
@@ -265,9 +273,12 @@ public class GameFrame extends Frame implements Runnable{
     private void newGame() {
         gameState = STATE_RUN;
         //繪製坦克
-        Player_Tank_1 = new OurTank(300,400,Tank.DIR_DOWN);
+        Player_Tank_1 = new OurTank(FRAME_WIDTH/3,FRAME_HEIGHT-Tank.RADIUS*2,Tank.DIR_UP);
         if(menuIndex==1)
-        Player_Tank_2 = new OurTank(600,400,Tank.DIR_DOWN);
+        Player_Tank_2 = new OurTank(FRAME_WIDTH/3*2,FRAME_HEIGHT-Tank.RADIUS*2,Tank.DIR_UP);
+
+        gameMap = new GameMap();
+
         //產生敵人
         new Thread(){
             @Override
