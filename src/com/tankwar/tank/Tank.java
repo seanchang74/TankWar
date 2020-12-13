@@ -4,11 +4,7 @@ package com.tankwar.tank;
 import com.tankwar.game.Bullet;
 import com.tankwar.game.Explode;
 import com.tankwar.game.GameFrame;
-import com.tankwar.utilis.BulletsPool;
-import com.tankwar.utilis.EnemyTanksPool;
-import com.tankwar.utilis.ExplodesPool;
-import com.tankwar.utilis.Constant;
-import com.tankwar.utilis.MyUtil;
+import com.tankwar.utilis.*;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -34,8 +30,6 @@ public abstract  class Tank {
     public static final int STATE_DIE = 2;
     //坦克初始血量
     public static final int DEFAULT_HP = 5;
-    //坦克名字
-    private String name;
     //敵人坦克血量
     public static final int ENEMY_MIN_HP = 1;
     public static final int ENEMY_MAX_HP = 3;
@@ -46,8 +40,8 @@ public abstract  class Tank {
     //座標
     private int x,y;
     private int atk;
-    private int hp = DEFAULT_HP;
-    private int enemyhp = MyUtil.getRandomNumber(ENEMY_MIN_HP,ENEMY_MAX_HP);
+    private static int hp = DEFAULT_HP;
+    private int enemy_hp = MyUtil.getRandomNumber(ENEMY_MIN_HP,ENEMY_MAX_HP+1);
     private int speed = DEFAULT_SPEED;
     private int dir;
     private int status = STATE_STAND;
@@ -74,7 +68,9 @@ public abstract  class Tank {
     private void initTank(){
         color = MyUtil.getRandomColor();
         atk = MyUtil.getRandomNumber(ATK_MIN,ATK_MAX);
-        name = MyUtil.getRandomName();
+        hp = DEFAULT_HP;
+        //坦克名字
+        String name = MyUtil.getRandomName();
     }
 
 
@@ -85,6 +81,7 @@ public abstract  class Tank {
         logic();
         drawTank(g,player);
         drawBullets(g,player);
+        drawLife(g,player);
 
     }
     /**
@@ -129,8 +126,8 @@ public abstract  class Tank {
                 break;
             case DIR_RIGHT:
                 x += speed;
-                if(x > Constant.FRAME_WIDTH - RADIUS){
-                    x = Constant.FRAME_WIDTH - RADIUS;
+                if(x > Constant.RUN_FRAME_WIDTH - RADIUS){
+                    x = Constant.RUN_FRAME_WIDTH - RADIUS;
                 }
                 break;
         }
@@ -151,7 +148,7 @@ public abstract  class Tank {
     public void setY(int y){
         this.y = y;
     }
-    public int getHp(){
+    public static int getHp(){
         return hp;
     }
     public void setHp(int hp){
@@ -210,12 +207,12 @@ public abstract  class Tank {
         isEnemy = enemy;
     }
 
-    public int getEnemyhp() {
-        return enemyhp;
+    public int getEnemy_hp() {
+        return enemy_hp;
     }
 
-    public void setEnemyhp(int enemyhp) {
-        this.enemyhp = enemyhp;
+    public void setEnemy_hp(int enemy_hp) {
+        this.enemy_hp = enemy_hp;
     }
 
     /**
@@ -281,16 +278,19 @@ public abstract  class Tank {
     //坦克受傷
     private void hurt(Bullet bullet){
         int atk = bullet.getAtk();
-        hp-=atk;
-        if(hp <= 0){
-            hp = 0;
-            die();
+        if(!isEnemy){
+            hp -= atk;
+            if (hp <= 0) {
+                hp = 0;
+                die();
+            }
         }
         if(isEnemy){
-            enemyhp-=atk;
-            if(enemyhp <= 0){
-                hp =0;
+            enemy_hp -=atk;
+            if(enemy_hp <= 0){
+                enemy_hp =0;
                 die();
+                SideBar.setScore(SideBar.getScore()+200);
             }
         }
     }
@@ -309,9 +309,22 @@ public abstract  class Tank {
     }
 
     public boolean isDie(){
-        return enemyhp<=0;
+        return enemy_hp <=0;
     }
 
+    private static final int SIDEBAR_X = Constant.RUN_FRAME_WIDTH;
+    //玩家血量圖片
+    private static Image life = MyUtil.createImage("res/image/material/life.png");
+    //繪製血量
+    //todo 畫血量需再調整
+    private void drawLife(Graphics g,int player){
+        g.setColor(Color.BLACK);
+        if(player !=0)
+        g.drawString("P"+player+" HP",SIDEBAR_X,0+Constant.FRAME_HEIGHT*2/3+60*(player-1));
+        for (int i = 0; i < hp; i++) {
+            g.drawImage(life,SIDEBAR_X+30*i,0+Constant.FRAME_HEIGHT*2/3,25,25,null);
+        }
+    }
     /**
      * 繪製當前坦克上所有的爆炸效果
      * @param g

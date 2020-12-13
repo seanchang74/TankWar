@@ -16,7 +16,7 @@ public class Explode {
     static {
         img = new Image[EXPLODE_FRAME_COUNT];
         for (int i = 0; i < img.length; i++) {
-            img[i] = MyUtil.createImage("res/image/blast"+(i+1)+".gif");
+            img[i] = MyUtil.createImage("res/image/material/blast"+(i+1)+".gif");
         }
     }
     //爆炸效果的屬性

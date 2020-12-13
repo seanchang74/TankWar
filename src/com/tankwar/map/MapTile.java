@@ -11,7 +11,7 @@ public class MapTile {
     private static Image tileImg;
     public static int tileW = 40;
     static {
-        tileImg = MyUtil.createImage("res/image/walls.gif");
+        tileImg = MyUtil.createImage("res/image/map/walls.gif");
         if(tileW <= 0){
             tileW = tileImg.getWidth(null);
         }

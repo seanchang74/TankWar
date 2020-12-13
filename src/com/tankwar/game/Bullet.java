@@ -69,7 +69,7 @@ public class Bullet {
                 break;
             case Tank.DIR_RIGHT:
                 x += speed;
-                if(x>Constant.FRAME_WIDTH)visible = false;
+                if(x>Constant.RUN_FRAME_WIDTH)visible = false;
                 break;
         }
     }

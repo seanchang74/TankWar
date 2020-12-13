@@ -5,6 +5,7 @@ import com.tankwar.tank.OurTank;
 import com.tankwar.tank.Tank;
 import com.tankwar.utilis.Constant;
 import com.tankwar.utilis.MyUtil;
+import com.tankwar.utilis.SideBar;
 
 import javax.swing.*;
 import java.awt.*;
@@ -30,17 +31,18 @@ public class GameFrame extends Frame implements Runnable{
     //最上方的高度
     public static int titleBarH;
     //宣告友方坦克
-    private Tank Player_Tank_1;
-    private Tank Player_Tank_2;
+    public Tank Player_Tank_1;
+    public Tank Player_Tank_2;
     //敵人坦克物件池
     private List<Tank> enemies = new ArrayList<>();
     //菜單指標
-    private static Image select_image = MyUtil.createImage("res/image/selecttank.gif");
+    private static Image select_image = MyUtil.createImage("res/image/material/selecttank.gif");
     //icon
-    private static ImageIcon icon = new ImageIcon("res/image/enemy3U.gif");
+    private static ImageIcon icon = new ImageIcon("res/image/tank/enemies/enemy3U.gif");
     //結束遊戲圖片
-    private static Image overImg = MyUtil.createImage("res/image/over.gif");
-
+    private static Image overImg = MyUtil.createImage("res/image/material/over.gif");
+    //側邊攔
+    private SideBar sideBar;
     //定義地圖相關的內容
     private GameMap gameMap;
     /**
@@ -136,8 +138,12 @@ public class GameFrame extends Frame implements Runnable{
     private void drawRun(Graphics g) {
         //繪製背景
         g.setColor(Color.BLACK);
-        g.fillRect(0,0,FRAME_WIDTH,FRAME_HEIGHT);
+        g.fillRect(0,0,RUN_FRAME_WIDTH,FRAME_HEIGHT);
 
+        //繪製側邊攔
+        g.setColor(Color.LIGHT_GRAY);
+        g.fillRect(RUN_FRAME_WIDTH,0,FRAME_WIDTH*1/5,FRAME_HEIGHT);
+        sideBar.draw(g);
         //繪製地圖
         gameMap.draw(g);
 
@@ -173,13 +179,14 @@ public class GameFrame extends Frame implements Runnable{
     private void drawOver(Graphics g) {
         int imgW = overImg.getWidth(null);
         int imgH = overImg.getHeight(null);
-        int imgX = FRAME_WIDTH - imgW >>1;
+        int imgX = RUN_FRAME_WIDTH - imgW >>1;
         int imgY = FRAME_HEIGHT - imgH >>1;
         final int DIS = 140;
         g.setColor(Color.BLACK);
-        g.fillRect(0,0,FRAME_WIDTH,FRAME_HEIGHT);
+        //想辦法解決@seanchang74 TODO
+        g.fillRect(0,0,RUN_FRAME_WIDTH,FRAME_HEIGHT);
         g.drawImage(overImg, imgX, imgY, null);
-
+        sideBar.draw(g);
         //提供選單
         for (int i = 0; i < OVER_STR.length; i++) {
             //紅色菜單
@@ -263,6 +270,9 @@ public class GameFrame extends Frame implements Runnable{
                     newGame();
                     break;
                 }
+                else if(menuIndex == MENUS.length-1){
+                    System.exit(0);
+                }
             }
         }
     }
@@ -273,12 +283,12 @@ public class GameFrame extends Frame implements Runnable{
     private void newGame() {
         gameState = STATE_RUN;
         //繪製坦克
-        Player_Tank_1 = new OurTank(FRAME_WIDTH/3,FRAME_HEIGHT-Tank.RADIUS*2,Tank.DIR_UP);
+        Player_Tank_1 = new OurTank(RUN_FRAME_WIDTH/3,FRAME_HEIGHT-Tank.RADIUS*2,Tank.DIR_UP);
         if(menuIndex==1)
-        Player_Tank_2 = new OurTank(FRAME_WIDTH/3*2,FRAME_HEIGHT-Tank.RADIUS*2,Tank.DIR_UP);
+        Player_Tank_2 = new OurTank(RUN_FRAME_WIDTH/3*2,FRAME_HEIGHT-Tank.RADIUS*2,Tank.DIR_UP);
 
         gameMap = new GameMap();
-
+        sideBar = new SideBar();
         //產生敵人
         new Thread(){
             @Override

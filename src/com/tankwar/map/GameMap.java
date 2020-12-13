@@ -17,7 +17,7 @@ public class GameMap {
 
     public static final int MAP_X = Tank.RADIUS*3;
     public static final int MAP_Y = Tank.RADIUS*3 + GameFrame.titleBarH;
-    public static final int MAP_WIDTH = Constant.FRAME_WIDTH - Tank.RADIUS*6;
+    public static final int MAP_WIDTH = Constant.RUN_FRAME_WIDTH - Tank.RADIUS*6;
     public static final int MAP_HEIGHT = Constant.FRAME_HEIGHT - Tank.RADIUS*8-GameFrame.titleBarH;
 
     //地圖元素塊的容器
