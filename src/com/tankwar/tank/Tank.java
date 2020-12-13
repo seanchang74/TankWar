@@ -4,11 +4,8 @@ package com.tankwar.tank;
 import com.tankwar.game.Bullet;
 import com.tankwar.game.Explode;
 import com.tankwar.game.GameFrame;
-import com.tankwar.utilis.BulletsPool;
-import com.tankwar.utilis.EnemyTanksPool;
-import com.tankwar.utilis.ExplodesPool;
-import com.tankwar.utilis.Constant;
-import com.tankwar.utilis.MyUtil;
+import com.tankwar.map.MapTile;
+import com.tankwar.utilis.*;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -106,8 +103,11 @@ public abstract  class Tank {
         }
     }
 
+    private int oldX = -1, oldY = -1;
     //坦克移動
     private void move(){
+        oldX = x;
+        oldY = y;
         switch (dir){
             case DIR_UP:
                 y -= speed;
@@ -268,16 +268,22 @@ public abstract  class Tank {
                 bullet.setVisible(false);
                 //坦克受到傷害
                 hurt(bullet);
-                //添加爆炸效果，以及當前被擊中坦克的座標
-                Explode explode = ExplodesPool.get();
-                explode.setX(x+RADIUS*2);
-                explode.setY(y+RADIUS*2);
-                explode.setVisible(true);
-                explode.setIndex(0);
-                explodes.add(explode);
+                //添加爆炸效果
+                addExplode(x+RADIUS*2,y+RADIUS*2);
             }
         }
     }
+
+    private void addExplode(int x,int y){
+        //添加爆炸效果，以及當前被擊中坦克的座標
+        Explode explode = ExplodesPool.get();
+        explode.setX(x);
+        explode.setY(y);
+        explode.setVisible(true);
+        explode.setIndex(0);
+        explodes.add(explode);
+    }
+
     //坦克受傷
     private void hurt(Bullet bullet){
         int atk = bullet.getAtk();
@@ -333,4 +339,95 @@ public abstract  class Tank {
 
     private class life{
     }
+
+    //坦克的子彈和地圖所有的塊的碰撞
+    public void bulletsCollideMapTiles(List<MapTile> tiles){
+        for (MapTile tile : tiles) {
+            if(tile.isCollideBullet(bullets)){
+                //添加爆炸效果
+                addExplode(tile.getX()+MapTile.radius*3,tile.getY()+MapTile.tileW*2);
+                //設置地圖塊銷毀
+                tile.setVisible(false);
+                //歸還對象池
+                MapTilePool.theReturn(tile);
+            }
+        }
+    }
+
+    /**
+     * 一個地圖塊和當前的坦克碰撞的方法
+     * 從tile中提取8個點，來判斷8個點是否有任何一個點和當前坦克發生碰撞
+     * 點的順序從左上角的點開始，順時針偵測
+     */
+    public boolean isCollideTile(List<MapTile> tiles){
+        for (MapTile tile : tiles) {
+            //點-1 左上角
+            int tileX = tile.getX();
+            int tileY = tile.getY();
+            boolean collide = MyUtil.isCollide(x, y, RADIUS, tileX, tileY);
+            //如果碰上了就直接返回，否則繼續判斷下一個點
+            if(collide){
+                return true;
+            }
+            //點-2 中上點
+            tileX += MapTile.radius;
+            collide = MyUtil.isCollide(x, y, RADIUS, tileX, tileY);
+            //如果碰上了就直接返回，否則繼續判斷下一個點
+            if(collide){
+                return true;
+            }
+            //點-3 右上角
+            tileX += MapTile.radius;
+            collide = MyUtil.isCollide(x, y, RADIUS, tileX, tileY);
+            //如果碰上了就直接返回，否則繼續判斷下一個點
+            if(collide){
+                return true;
+            }
+            //點-4 中右點
+            tileY += MapTile.radius;
+            collide = MyUtil.isCollide(x, y, RADIUS, tileX, tileY);
+            //如果碰上了就直接返回，否則繼續判斷下一個點
+            if(collide){
+                return true;
+            }
+            //點-5 右下角
+            tileY += MapTile.radius;
+            collide = MyUtil.isCollide(x, y, RADIUS, tileX, tileY);
+            //如果碰上了就直接返回，否則繼續判斷下一個點
+            if(collide){
+                return true;
+            }
+            //點-6 中下點
+            tileX -= MapTile.radius;
+            collide = MyUtil.isCollide(x, y, RADIUS, tileX, tileY);
+            //如果碰上了就直接返回，否則繼續判斷下一個點
+            if(collide){
+                return true;
+            }
+            //點-7 左下角
+            tileX -= MapTile.radius;
+            collide = MyUtil.isCollide(x, y, RADIUS, tileX, tileY);
+            //如果碰上了就直接返回，否則繼續判斷下一個點
+            if(collide){
+                return true;
+            }
+            //點-8 中左點
+            tileY -= MapTile.radius;
+            collide = MyUtil.isCollide(x, y, RADIUS, tileX, tileY);
+            //如果碰上了就直接返回，否則繼續判斷下一個點
+            if(collide){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 坦克回退的方法
+     */
+    public void back() {
+        x = oldX;
+        y = oldY;
+    }
+
 }
