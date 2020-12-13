@@ -1,5 +1,6 @@
 package com.tankwar.game;
 import com.tankwar.map.GameMap;
+import com.tankwar.map.MapTile;
 import com.tankwar.tank.EnemyTank;
 import com.tankwar.tank.OurTank;
 import com.tankwar.tank.Tank;
@@ -157,6 +158,8 @@ public class GameFrame extends Frame implements Runnable{
         bulletCollideTank();
         //繪製爆炸
         drawExplodes(g);
+        //子彈和所有地圖塊的碰撞
+        bulletCollideMapTile();
     }
     //繪製敵人坦克，若已經死亡從中移除
     private  void drawEnemies(Graphics g){
@@ -466,6 +469,32 @@ public class GameFrame extends Frame implements Runnable{
             if(menuIndex == 1)
             Player_Tank_2.collideBullets(enemy.getBullets());
         }
+    }
+
+    //所有的子彈和地圖塊的碰撞
+    private void bulletCollideMapTile(){
+        //自己的坦克的子彈和地圖塊的碰撞
+       Player_Tank_1.bulletsCollideMapTiles(gameMap.getTiles());
+       if(menuIndex == 1)
+            Player_Tank_2.bulletsCollideMapTiles(gameMap.getTiles());
+        for (Tank enemy : enemies) {
+            enemy.bulletsCollideMapTiles(gameMap.getTiles());
+        }
+        //坦克和地圖的碰撞
+        if(Player_Tank_1.isCollideTile(gameMap.getTiles())){
+            Player_Tank_1.back();
+        }
+        if(menuIndex == 1)
+            if(Player_Tank_2.isCollideTile(gameMap.getTiles())){
+                Player_Tank_2.back();
+            }
+        for (Tank enemy : enemies) {
+            if(enemy.isCollideTile(gameMap.getTiles())){
+                enemy.back();
+            }
+        }
+        //清理所有的被銷毀的地圖塊
+        gameMap.clearDestoryTile();
     }
 
     private void drawExplodes(Graphics g){
