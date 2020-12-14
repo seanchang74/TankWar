@@ -5,11 +5,15 @@ import com.tankwar.game.Bullet;
 import com.tankwar.game.Explode;
 import com.tankwar.game.GameFrame;
 import com.tankwar.map.MapTile;
+import com.tankwar.utilis.PlayerHandling.*;
 import com.tankwar.utilis.*;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.tankwar.utilis.PlayerHandling.*;
+import static com.tankwar.utilis.SideBar.drawLife;
 
 
 /**
@@ -29,8 +33,8 @@ public abstract  class Tank {
     public static final int STATE_STAND = 0;
     public static final int STATE_MOVE = 1;
     public static final int STATE_DIE = 2;
-    //坦克初始血量
-    public static final int DEFAULT_HP = 5;
+    //坦克名字
+    private String name;
     //敵人坦克血量
     public static final int ENEMY_MIN_HP = 1;
     public static final int ENEMY_MAX_HP = 3;
@@ -41,13 +45,15 @@ public abstract  class Tank {
     //座標
     private int x,y;
     private int atk;
-    private static int hp = DEFAULT_HP;
+    private static int hp = 0;
     private int enemy_hp = MyUtil.getRandomNumber(ENEMY_MIN_HP,ENEMY_MAX_HP+1);
     private int speed = DEFAULT_SPEED;
     private int dir;
     private int status = STATE_STAND;
     private Color color;
     private boolean isEnemy = false;
+    //是否可見
+    private boolean visible = true;
 
 
     //砲彈容器
@@ -66,12 +72,17 @@ public abstract  class Tank {
         initTank();
     }
 
-    private void initTank(){
+    public void initTank(){
         color = MyUtil.getRandomColor();
-        atk = MyUtil.getRandomNumber(ATK_MIN,ATK_MAX);
-        hp = DEFAULT_HP;
+        //坦克攻擊力
+        atk = MyUtil.getRandomNumber(ATK_MIN,ATK_MAX+1);
+        //初始化坦克血量
+        PlayerHandling.initTank_hp();
+        //是否可見 TODO 目前無用處暫且保留
+        visible = true;
         //坦克名字
-        String name = MyUtil.getRandomName();
+        name = MyUtil.getRandomName();
+        System.out.println("init");
     }
 
 
@@ -79,12 +90,21 @@ public abstract  class Tank {
         /**
          * 每楨都要執行
          */
+        if(!isEnemy)hp = player_hp(player);
         logic();
         drawTank(g,player);
         drawBullets(g,player);
-        drawLife(g,player);
+        drawName(g);
 
     }
+
+
+    private void drawName(Graphics g) {
+        g.setColor(color);
+        g.setFont(Constant.NAME_FONT);
+        g.drawString(name,x - RADIUS,y-35);
+    }
+
     /**
      * 繪製坦克
      * @param g
@@ -187,6 +207,14 @@ public abstract  class Tank {
         this.status = status;
     }
 
+    public boolean isVisible() {
+        return visible;
+    }
+
+    public void setVisible(boolean visible) {
+        this.visible = visible;
+    }
+
     public Color getColor() {
         return color;
     }
@@ -258,7 +286,7 @@ public abstract  class Tank {
         }
     }
     //坦克和子彈碰撞判斷
-    public void collideBullets(List<Bullet> bullets){
+    public void collideBullets(List<Bullet> bullets ,int player){
         //對所有子彈和坦克進行碰撞檢測
         for(Bullet bullet : bullets){
             int bulletX = bullet.getX();
@@ -268,32 +296,29 @@ public abstract  class Tank {
                 //子彈消失
                 bullet.setVisible(false);
                 //坦克受到傷害
-                hurt(bullet);
+                hurt(bullet,player);
                 //添加爆炸效果
                 addExplode(x+RADIUS*2,y+RADIUS*2);
             }
         }
     }
 
-    private void addExplode(int x,int y){
-        //添加爆炸效果，以及當前被擊中坦克的座標
-        Explode explode = ExplodesPool.get();
-        explode.setX(x);
-        explode.setY(y);
-        explode.setVisible(true);
-        explode.setIndex(0);
-        explodes.add(explode);
+    private void addExplode(int x,int y){//添加爆炸效果，以及當前被擊中坦克的座標
+            Explode explode = ExplodesPool.get();
+            explode.setX(x);
+            explode.setY(y);
+            explode.setVisible(true);
+            explode.setIndex(0);
+            explodes.add(explode);
     }
 
     //坦克受傷
-    private void hurt(Bullet bullet){
+    private void hurt(Bullet bullet,int player){
         int atk = bullet.getAtk();
+
         if(!isEnemy){
-            hp -= atk;
-            if (hp <= 0) {
-                hp = 0;
+            if(player_get_hurt(player,atk) == Constant.PLAYER_BOTH_DIE)
                 die();
-            }
         }
         if(isEnemy){
             enemy_hp -=atk;
@@ -305,7 +330,7 @@ public abstract  class Tank {
         }
     }
 
-    private void die(){
+    public void die(){
         //敵人死了
         if(isEnemy){
             //歸還物件池
@@ -313,6 +338,7 @@ public abstract  class Tank {
         }
         else{//TODO
             //gameover
+
             GameFrame.setGameState(Constant.STATE_OVER);
 
         }
@@ -322,36 +348,24 @@ public abstract  class Tank {
         return enemy_hp <=0;
     }
 
-    private static final int SIDEBAR_X = Constant.RUN_FRAME_WIDTH;
-    //玩家血量圖片
-    private static Image life = MyUtil.createImage("res/image/material/life.png");
-    //繪製血量
-    //todo 畫血量需再調整
-    private void drawLife(Graphics g,int player){
-        g.setColor(Color.BLACK);
-        if(player !=0)
-        g.drawString("P"+player+" HP",SIDEBAR_X,0+Constant.FRAME_HEIGHT*2/3+60*(player-1));
-        for (int i = 0; i < hp; i++) {
-            g.drawImage(life,SIDEBAR_X+30*i,0+Constant.FRAME_HEIGHT*2/3,25,25,null);
-        }
-    }
+
     /**
      * 繪製當前坦克上所有的爆炸效果
      * @param g
      */
     public void drawExplode(Graphics g){
-        for (Explode explode : explodes) {
-            explode.draw(g);
-        }
-//        將不可見的爆炸效果刪除
-        for (int i = 0; i < explodes.size(); i++) {
-            Explode explode = explodes.get(i);
-            if(!explode.isVisible()){
-                Explode remove = explodes.remove(i);
-                ExplodesPool.back(remove);
-                i--;
+            for (Explode explode : explodes) {
+                explode.draw(g);
             }
-        }
+//        將不可見的爆炸效果刪除
+            for (int i = 0; i < explodes.size(); i++) {
+                Explode explode = explodes.get(i);
+                if (!explode.isVisible()) {
+                    Explode remove = explodes.remove(i);
+                    ExplodesPool.back(remove);
+                    i--;
+                }
+            }
     }
 
     private class life{

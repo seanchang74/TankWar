@@ -11,7 +11,7 @@ public class Constant {
     public static final String GAME_TITLE = "坦克大戰1.0";
     public static final int FRAME_WIDTH = 1100;
     public static final int FRAME_HEIGHT = 576;
-    public static final int RUN_FRAME_WIDTH = FRAME_WIDTH*5/6
+    public static final int RUN_FRAME_WIDTH = FRAME_WIDTH*9/10;
             ;
 
     //動態獲得系統的解析度
@@ -29,9 +29,8 @@ public class Constant {
     public  static final int STATE_OVER = 3;
 
     public static final String[] MENUS = {
-            "1 PLAYER(未實裝)",
+            "1 PLAYER",
             "2 PLAYERS",
-            "CONTINUE(未實裝)",
             "關於",
             "退出遊戲",
     };
@@ -41,7 +40,7 @@ public class Constant {
             "返回標題",
     };
     // 字體設定
-    public  static final Font FONT = new Font("微軟正黑體",Font.BOLD,20);
+    public  static final Font FONT = new Font("微軟正黑體",Font.BOLD,25);
     public  static final Font NAME_FONT = new Font("微軟正黑體",Font.BOLD,15);
 
     //螢幕刷新
@@ -55,4 +54,10 @@ public class Constant {
     public static final int ENEMY_AI_INTERVAL = 1500;
     //AI開火機率
     public static final double ENEMY_FIRE_CHANGE = 0.05;
+
+    //玩家坦克狀態
+    public static final int PLAYER1_DIE = 1;
+    public static final int PLAYER2_DIE = 2;
+    public static final int PLAYER_BOTH_DIE = 3;
+    public static final int PLAYER_BOTH_ALIVE = 4;
 }
