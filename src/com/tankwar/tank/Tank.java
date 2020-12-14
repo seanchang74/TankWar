@@ -219,20 +219,29 @@ public abstract  class Tank {
         this.enemy_hp = enemy_hp;
     }
 
+    //上一次開火的時間
+    private long fireTime;
+    //子彈發射的最小的間隔
+    public static final int FIRE_INTERVAL = 500;
     /**
      * 坦克開火
      */
     public void fire(){
-        //從子彈池拿子彈
-        Bullet bullet = BulletsPool.get();
-        //子彈屬性設定
-        bullet.setX(x);
-        bullet.setY(y);
-        bullet.setDir(dir);
-        bullet.setAtk(atk);
-        bullet.setVisible(true);
-        bullets.add(bullet);
-    }
+        if(System.currentTimeMillis() - fireTime > FIRE_INTERVAL){
+            //從子彈池拿子彈
+            Bullet bullet = BulletsPool.get();
+            //子彈屬性設定
+            bullet.setX(x);
+            bullet.setY(y);
+            bullet.setDir(dir);
+            bullet.setAtk(atk);
+            bullet.setVisible(true);
+            bullets.add(bullet);
+
+            //發射子彈之後，紀錄本次發射的時間
+            fireTime = System.currentTimeMillis();
+        }
+   }
 
     /**
      * 繪製坦克的子彈
@@ -311,10 +320,8 @@ public abstract  class Tank {
             //歸還物件池
             EnemyTanksPool.theReturn(this);
         }
-        else{//TODO
-            //gameover
-            GameFrame.setGameState(Constant.STATE_OVER);
-
+        else{
+            delaySecondsToOver(1500);
         }
     }
 
@@ -362,13 +369,35 @@ public abstract  class Tank {
         for (MapTile tile : tiles) {
             if(tile.isCollideBullet(bullets)){
                 //添加爆炸效果
-                addExplode(tile.getX()+MapTile.radius*3,tile.getY()+MapTile.tileW*2);
+//                addExplode(tile.getX()+MapTile.radius*3,tile.getY()+MapTile.tileW*2);
                 //設置地圖塊銷毀
                 tile.setVisible(false);
                 //歸還對象池
                 MapTilePool.theReturn(tile);
+                //當主堡被擊毀後，1.5秒鐘之後切換到遊戲結束的畫面
+                if(tile.isHouse()){
+                    delaySecondsToOver(1500);
+                }
             }
         }
+    }
+
+
+    /**
+     * 延遲若干毫秒切換到遊戲結束
+     * @param millisSecond
+     */
+    private void delaySecondsToOver(int millisSecond){
+        new Thread(){
+            public void run(){
+                try {
+                    Thread.sleep(millisSecond);
+                }catch (InterruptedException e){
+                    e.printStackTrace();
+                }
+                GameFrame.setGameState(Constant.STATE_OVER);
+            }
+        }.start();
     }
 
     /**

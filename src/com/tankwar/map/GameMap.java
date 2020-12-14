@@ -8,6 +8,7 @@ import com.tankwar.utilis.MyUtil;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -23,6 +24,8 @@ public class GameMap {
     //地圖元素塊的容器
     private List<MapTile> tiles = new ArrayList<>();
 
+    //繪製主堡
+    private TankHouse house;
     public GameMap() {
         initMap();
     }
@@ -46,6 +49,15 @@ public class GameMap {
             tile.setY(y);
             tiles.add(tile);
         }
+
+        //初始化主堡
+        house = new TankHouse();
+        addHouse();
+    }
+
+    //將主堡周圍的地圖塊添加到地圖的容器中
+    private void addHouse(){
+        tiles.addAll(house.getTiles());
     }
 
     /**

@@ -9,9 +9,9 @@ import java.net.PortUnreachableException;
 public class Constant {
     /********************遊戲視窗相關*******************/
     public static final String GAME_TITLE = "坦克大戰1.0";
-    public static final int FRAME_WIDTH = 1100;
-    public static final int FRAME_HEIGHT = 576;
-    public static final int RUN_FRAME_WIDTH = FRAME_WIDTH*5/6
+    public static final int FRAME_WIDTH = 1200;
+    public static final int FRAME_HEIGHT = 600;
+    public static final int RUN_FRAME_WIDTH = FRAME_WIDTH*9/10;
             ;
 
     //動態獲得系統的解析度
