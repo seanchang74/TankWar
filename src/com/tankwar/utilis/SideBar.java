@@ -5,6 +5,8 @@ import com.tankwar.tank.Tank;
 
 import java.awt.*;
 
+import static com.tankwar.utilis.Constant.*;
+
 public class SideBar {
 
     private static int score = 0;
@@ -15,10 +17,13 @@ public class SideBar {
     //sidebar相關繪製
     public void draw(Graphics g,int player){
         drawScore(g);//血條繪製
-        drawLife(g,1);
-        drawLife(g,2);
+        drawLife(g,player);
     }
 
+    public void drawBackground(Graphics g){
+        g.setColor(Color.LIGHT_GRAY);
+        g.fillRect(RUN_FRAME_WIDTH,0,FRAME_WIDTH*1/5,FRAME_HEIGHT);
+    }
     /**
      * 繪製分數(暫) TODO
      * @param g
@@ -48,21 +53,17 @@ public class SideBar {
         g.setFont(Constant.FONT);
         //繪製1P
         if(player == 1) {
+            System.out.println("side bar 1");
             g.drawImage(player1icon, SIDEBAR_X+BORDER, 0 + THEY, player1icon.getWidth(null) * 3 / 2, player1icon.getHeight(null) * 3 / 2, null);
             g.drawImage(life, SIDEBAR_X+BORDER, 0 + THEY + 10 + player1icon.getHeight(null), life.getWidth(null) * 3 / 2, life.getHeight(null) * 3 / 2, null);
             g.drawString(String.valueOf(hp1),SIDEBAR_X+5+life.getWidth(null)*3/2+BORDER,0+THEY+23+player1icon.getHeight(null)*3/2);
         }//繪製2P
         else if(player == 2){
+            System.out.println("side bar 2");
             g.drawImage(player2icon, SIDEBAR_X+DIS, 0 + THEY, player1icon.getWidth(null) * 3 / 2, player1icon.getHeight(null) * 3 / 2, null);
             g.drawImage(life, SIDEBAR_X+DIS, 0 + THEY + 10 + player1icon.getHeight(null), life.getWidth(null) * 3 / 2, life.getHeight(null) * 3 / 2, null);
             g.drawString(String.valueOf(hp2),SIDEBAR_X+5+life.getWidth(null)*3/2+DIS,0+THEY+23+player1icon.getHeight(null)*3/2);
         }
-        else if(player == 3){
-            g.drawString(String.valueOf(hp2),SIDEBAR_X+5+life.getWidth(null)*3/2+DIS,0+THEY+23+player1icon.getHeight(null)*3/2);
-            g.drawString(String.valueOf(hp1),SIDEBAR_X+5+life.getWidth(null)*3/2+BORDER,0+THEY+23+player1icon.getHeight(null)*3/2);
-
-        }
-
     }
 
 

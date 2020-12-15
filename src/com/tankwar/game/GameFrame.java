@@ -1,14 +1,11 @@
 package com.tankwar.game;
 import com.tankwar.map.GameMap;
-import com.tankwar.map.MapTile;
 import com.tankwar.tank.EnemyTank;
 import com.tankwar.tank.OurTank;
 import com.tankwar.tank.Tank;
-import com.tankwar.utilis.Constant;
 import com.tankwar.utilis.MyUtil;
 import com.tankwar.utilis.PlayerHandling;
 import com.tankwar.utilis.SideBar;
-import static com.tankwar.utilis.PlayerHandling.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -21,7 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.tankwar.utilis.Constant.*;
-import static com.tankwar.utilis.SideBar.drawLife;
 
 
 //遊戲主畫面
@@ -32,6 +28,8 @@ public class GameFrame extends Frame implements Runnable{
     private static int gameState;
     //菜單被選
     private int menuIndex;
+    //結束菜單
+    private int overIndex;
     //最上方的高度
     public static int titleBarH;
     //宣告友方坦克
@@ -145,11 +143,9 @@ public class GameFrame extends Frame implements Runnable{
         g.fillRect(0,0,RUN_FRAME_WIDTH,FRAME_HEIGHT);
 
         //繪製側邊攔
-        g.setColor(Color.LIGHT_GRAY);
-        g.fillRect(RUN_FRAME_WIDTH,0,FRAME_WIDTH*1/5,FRAME_HEIGHT);
-        if (Player_Tank_1!=null)
-            sideBar.draw(g,1);
-        if (Player_Tank_2!=null)
+        sideBar.drawBackground(g);
+        sideBar.draw(g,1);
+        if (menuIndex == 1)
             sideBar.draw(g,2);
 
 
@@ -202,11 +198,13 @@ public class GameFrame extends Frame implements Runnable{
         //想辦法解決@seanchang74 TODO
         g.fillRect(0,0,RUN_FRAME_WIDTH,FRAME_HEIGHT);
         g.drawImage(overImg, imgX, imgY, null);
-        sideBar.draw(g,3);
+        sideBar.drawBackground(g);
+        sideBar.draw(g,1);
+        if(menuIndex == 1)sideBar.draw(g,2);
         //提供選單
         for (int i = 0; i < OVER_STR.length; i++) {
             //紅色菜單
-            if(i == menuIndex){
+            if(i == overIndex){
                 g.setColor(Color.RED);
             }
             else g.setColor(Color.WHITE);
@@ -300,9 +298,10 @@ public class GameFrame extends Frame implements Runnable{
         gameState = STATE_RUN;
         //繪製坦克
         Player_Tank_1 = new OurTank(RUN_FRAME_WIDTH/3,FRAME_HEIGHT-Tank.RADIUS*2,Tank.DIR_UP);
-        if(menuIndex==1)
-        Player_Tank_2 = new OurTank(RUN_FRAME_WIDTH/3*2,FRAME_HEIGHT-Tank.RADIUS*2,Tank.DIR_UP);
-
+        if(menuIndex==1) {
+            System.out.println("new 2");
+            Player_Tank_2 = new OurTank(RUN_FRAME_WIDTH / 3 * 2, FRAME_HEIGHT - Tank.RADIUS * 2, Tank.DIR_UP);
+        }
         gameMap = new GameMap();
         sideBar = new SideBar();
         //產生敵人
@@ -413,24 +412,24 @@ public class GameFrame extends Frame implements Runnable{
         switch (keyCode){
             case KeyEvent.VK_LEFT:
             case KeyEvent.VK_A:
-                if(--menuIndex<0){
-                    menuIndex=0;
+                if(--overIndex<0){
+                    overIndex=0;
                 }
                 break;
             case KeyEvent.VK_RIGHT:
             case KeyEvent.VK_D:
-                if(++menuIndex>1){
-                    menuIndex=1;
+                if(++overIndex>1){
+                    overIndex=1;
                 }
                 break;
             case KeyEvent.VK_ENTER:{
                 //TODO
                 //結束遊戲
-                if(menuIndex == 0) {
+                if(overIndex == 0) {
                     System.exit(0);
                 }
                 //回到標題
-                else if(menuIndex == 1){
+                else if(overIndex == 1){
                     gameState =  STATE_MENU;
                     //重製遊戲
                     resetGame();
@@ -443,14 +442,14 @@ public class GameFrame extends Frame implements Runnable{
     public void deletePlayer(){
         if(Player_Tank_1 != null) {
             if (PlayerHandling.getHp1() == 0) {
-                if (Player_Tank_2 == null) Player_Tank_1.die();
+                if (Player_Tank_2 == null) Player_Tank_1.gameover();
                 Player_Tank_1 = null;
                 System.out.println("p1 die");
             }
         }
         if(Player_Tank_2 != null) {
             if (PlayerHandling.getHp2() == 0) {
-                if (Player_Tank_1 == null) Player_Tank_2.die();
+                if (Player_Tank_1 == null) Player_Tank_2.gameover();
                 Player_Tank_2 = null;
                 System.out.println("p2 die ");
             }

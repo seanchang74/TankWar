@@ -5,7 +5,6 @@ import com.tankwar.game.Bullet;
 import com.tankwar.game.Explode;
 import com.tankwar.game.GameFrame;
 import com.tankwar.map.MapTile;
-import com.tankwar.utilis.PlayerHandling.*;
 import com.tankwar.utilis.*;
 
 import java.awt.*;
@@ -13,7 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.tankwar.utilis.PlayerHandling.*;
-import static com.tankwar.utilis.SideBar.drawLife;
 
 
 /**
@@ -82,7 +80,6 @@ public abstract  class Tank {
         visible = true;
         //坦克名字
         name = MyUtil.getRandomName();
-        System.out.println("init");
     }
 
 
@@ -327,19 +324,19 @@ public abstract  class Tank {
 
         if(!isEnemy){
             if(player_get_hurt(player,atk) == Constant.PLAYER_BOTH_DIE)
-                die();
+                gameover();
         }
         if(isEnemy){
             enemy_hp -=atk;
             if(enemy_hp <= 0){
                 enemy_hp =0;
-                die();
+                gameover();
                 SideBar.setScore(SideBar.getScore()+200);
             }
         }
     }
 
-    public void die(){
+    public void gameover(){
         //敵人死了
         if(isEnemy){
             //歸還物件池
@@ -348,7 +345,7 @@ public abstract  class Tank {
         else{//TODO
             //gameover
             
-            delaySecondsToOver(1500);
+//            delaySecondsToOver(1500);
             GameFrame.setGameState(Constant.STATE_OVER);
             
         }
@@ -422,7 +419,7 @@ public abstract  class Tank {
      * 從tile中提取8個點，來判斷8個點是否有任何一個點和當前坦克發生碰撞
      * 點的順序從左上角的點開始，順時針偵測
      */
-    public boolean isCollideTile(List<MapTile> tiles){
+     public boolean isCollideTile(List<MapTile> tiles){
         for (MapTile tile : tiles) {
             //點-1 左上角
             int tileX = tile.getX();
