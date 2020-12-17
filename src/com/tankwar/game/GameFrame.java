@@ -145,21 +145,22 @@ public class GameFrame extends Frame implements Runnable{
         g.setColor(Color.LIGHT_GRAY);
         g.fillRect(RUN_FRAME_WIDTH,0,FRAME_WIDTH*1/5,FRAME_HEIGHT);
         sideBar.draw(g);
-        //繪製地圖
-        gameMap.draw(g);
-
+        //繪製地圖的碰撞層
+        gameMap.drawBk(g);
         //繪製敵人坦克
         drawEnemies(g);
         //繪製坦克
         Player_Tank_1.draw(g,1);
         if(menuIndex ==1)
             Player_Tank_2.draw(g,2);
+        //繪製地圖的遮擋層
+        gameMap.drawCover(g);
         //碰撞檢測
         bulletCollideTank();
         //繪製爆炸
         drawExplodes(g);
         //子彈和所有地圖塊的碰撞
-        bulletCollideMapTile();
+        bulletAndTankCollideMapTile();
     }
     //繪製敵人坦克，若已經死亡從中移除
     private  void drawEnemies(Graphics g){
@@ -472,7 +473,7 @@ public class GameFrame extends Frame implements Runnable{
     }
 
     //所有的子彈和地圖塊的碰撞
-    private void bulletCollideMapTile(){
+    private void bulletAndTankCollideMapTile(){
         //自己的坦克的子彈和地圖塊的碰撞
        Player_Tank_1.bulletsCollideMapTiles(gameMap.getTiles());
        if(menuIndex == 1)

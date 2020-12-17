@@ -370,6 +370,9 @@ public abstract  class Tank {
             if(tile.isCollideBullet(bullets)){
                 //添加爆炸效果
 //                addExplode(tile.getX()+MapTile.radius*3,tile.getY()+MapTile.tileW*2);
+                //鐵塊無法被消除
+                if(tile.getType() == MapTile.TYPE_STEELS)
+                    continue;
                 //設置地圖塊銷毀
                 tile.setVisible(false);
                 //歸還對象池
@@ -407,6 +410,9 @@ public abstract  class Tank {
      */
     public boolean isCollideTile(List<MapTile> tiles){
         for (MapTile tile : tiles) {
+            //如果塊不可見，或是為草地塊時就不進行碰撞檢測
+            if(!tile.isVisible() || tile.getType() == MapTile.TYPE_GRASS)
+                continue;
             //點-1 左上角
             int tileX = tile.getX();
             int tileY = tile.getY();
