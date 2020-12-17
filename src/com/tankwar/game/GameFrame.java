@@ -42,7 +42,7 @@ public class GameFrame extends Frame implements Runnable{
     //icon
     private static ImageIcon icon = new ImageIcon("res/image/tank/enemies/enemy3U.gif");
     //結束遊戲圖片
-    private static Image overImg = MyUtil.createImage("res/image/material/over.gif");
+    private static Image overImg = MyUtil.createImage("res/image/material/over.png");
     //側邊攔
     private SideBar sideBar;
     //定義地圖相關的內容
@@ -193,7 +193,7 @@ public class GameFrame extends Frame implements Runnable{
         int imgH = overImg.getHeight(null);
         int imgX = RUN_FRAME_WIDTH - imgW >>1;
         int imgY = FRAME_HEIGHT - imgH >>1;
-        final int DIS = 140;
+        final int DIS = 250;
         g.setColor(Color.BLACK);
         //想辦法解決@seanchang74 TODO
         g.fillRect(0,0,RUN_FRAME_WIDTH,FRAME_HEIGHT);
@@ -208,8 +208,9 @@ public class GameFrame extends Frame implements Runnable{
                 g.setColor(Color.RED);
             }
             else g.setColor(Color.WHITE);
-            g.drawString(OVER_STR[i], imgX-67+DIS*i,imgY+90 );
+            g.drawString(OVER_STR[i], imgX+40+DIS*i,imgY+imgH+20 );
         }
+        System.out.println(imgX+" "+imgY);
     }
 
 

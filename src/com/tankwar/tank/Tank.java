@@ -43,7 +43,6 @@ public abstract  class Tank {
     //座標
     private int x,y;
     private int atk;
-    private static int hp = 0;
     private int enemy_hp = MyUtil.getRandomNumber(ENEMY_MIN_HP,ENEMY_MAX_HP+1);
     private int speed = DEFAULT_SPEED;
     private int dir;
@@ -76,8 +75,6 @@ public abstract  class Tank {
         atk = MyUtil.getRandomNumber(ATK_MIN,ATK_MAX+1);
         //初始化坦克血量
         PlayerHandling.initTank_hp();
-        //是否可見 TODO 目前無用處暫且保留
-        visible = true;
         //坦克名字
         name = MyUtil.getRandomName();
     }
@@ -87,7 +84,6 @@ public abstract  class Tank {
         /**
          * 每楨都要執行
          */
-        if(!isEnemy)hp = player_hp(player);
         logic();
         drawTank(g,player);
         drawBullets(g,player);
@@ -168,12 +164,6 @@ public abstract  class Tank {
     }
     public void setY(int y){
         this.y = y;
-    }
-    public static int getHp(){
-        return hp;
-    }
-    public void setHp(int hp){
-        this.hp = hp;
     }
     public int getAtk(){
         return atk;
@@ -323,6 +313,7 @@ public abstract  class Tank {
         int atk = bullet.getAtk();
 
         if(!isEnemy){
+            this.setVisible(false);
             if(player_get_hurt(player,atk) == Constant.PLAYER_BOTH_DIE)
                 gameover();
         }
@@ -336,6 +327,20 @@ public abstract  class Tank {
         }
     }
 
+    private static Image shield1 = MyUtil.createImage("res/image/material/shield1.png");
+    private static Image shield2 = MyUtil.createImage("res/image/material/shield2.png");
+
+    private void reborn(Graphics g){
+//        new Thread(){
+//            public void run(){
+//                for (int i = 0; i < 50; ++i) {
+//                    test.randomPaint();
+//                    Thread.sleep(100);
+//                }
+//            }
+//        }.start();
+    }
+
     public void gameover(){
         //敵人死了
         if(isEnemy){
@@ -344,8 +349,7 @@ public abstract  class Tank {
         }
         else{//TODO
             //gameover
-            
-//            delaySecondsToOver(1500);
+
             GameFrame.setGameState(Constant.STATE_OVER);
             
         }
@@ -373,9 +377,6 @@ public abstract  class Tank {
                     i--;
                 }
             }
-    }
-
-    private class life{
     }
 
     //坦克的子彈和地圖所有的塊的碰撞
