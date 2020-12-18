@@ -36,24 +36,11 @@ public class GameMap {
     private void initMap(){
         //隨機的得到一個地圖元素塊，添加到容器中
         final int COUNT = 20;
-//        for (int i = 0; i < COUNT; i++) {
-//            MapTile tile = MapTilePool.get();
-//            int x = MyUtil.getRandomNumber(MAP_X,MAP_X+MAP_WIDTH-MapTile.tileW);
-//            int y = MyUtil.getRandomNumber(MAP_Y,MAP_Y+MAP_HEIGHT-MapTile.tileW);
-//            //新生成的隨機塊和已經存在的塊有重疊的部分，則重新生成
-//            if(isCollide(tiles,x,y)){
-//                i--;
-//                continue;
-//            }
-//            tile.setX(x);
-//            tile.setY(y);
-//            tiles.add(tile);
-//        }
 
         //三行的地圖
         addRow(MAP_X,MAP_Y,MAP_X+MAP_WIDTH,MapTile.TYPE_NORMAL,0);
         addRow(MAP_X,MAP_Y+MapTile.tileW*2,MAP_X+MAP_WIDTH,MapTile.TYPE_GRASS,0);
-        addRow(MAP_X,MAP_Y+MapTile.tileW*4,MAP_X+MAP_WIDTH,MapTile.TYPE_STEELS,MapTile.tileW);
+        addRow(MAP_X,MAP_Y+MapTile.tileW*4,MAP_X+MAP_WIDTH,MapTile.TYPE_WATER,MapTile.tileW+20);
         //初始化主堡
         house = new TankHouse();
         addHouse();

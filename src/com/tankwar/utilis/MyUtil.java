@@ -58,7 +58,7 @@ public class MyUtil {
         //正方形中心點和 點的X，Y軸的距離
         int disX = Math.abs(rectX-pointX);
         int disY = Math.abs(rectY-pointY);
-        if (disX < radius && disY < radius){
+        if (disX <= radius && disY <= radius){
             return true;
         }
         else return false;

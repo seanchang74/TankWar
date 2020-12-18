@@ -80,6 +80,7 @@ public class GameFrame extends Frame implements Runnable{
         setVisible(true);
         //上方標題的高度
         titleBarH = getInsets().top;
+        System.out.println(titleBarH);
 
     }
 
@@ -143,6 +144,9 @@ public class GameFrame extends Frame implements Runnable{
         g.fillRect(0,0,RUN_FRAME_WIDTH,FRAME_HEIGHT);
 
         //繪製側邊攔
+        sideBar.drawBackground(g);
+        sideBar.draw(g,1);
+        if (menuIndex == 1)
             sideBar.draw(g,2);
         //繪製地圖的碰撞層
         gameMap.drawBk(g);
@@ -157,14 +161,13 @@ public class GameFrame extends Frame implements Runnable{
         //繪製地圖的遮擋層
         gameMap.drawCover(g);
         //碰撞檢測
-        bulletCollideTank();
+        bulletCollideTank(g);
         //繪製爆炸
         drawExplodes(g);
         //子彈和所有地圖塊的碰撞
-        bulletCollideMapTile();
+        bulletAndTankCollideMapTile();
         //檢測玩家死亡
         deletePlayer();
-        bulletAndTankCollideMapTile();
     }
     //繪製敵人坦克，若已經死亡從中移除
     private  void drawEnemies(Graphics g){
@@ -294,10 +297,10 @@ public class GameFrame extends Frame implements Runnable{
     private void newGame() {
         gameState = STATE_RUN;
         //繪製坦克
-        Player_Tank_1 = new OurTank(RUN_FRAME_WIDTH/3,FRAME_HEIGHT-Tank.RADIUS*2,Tank.DIR_UP);
+        Player_Tank_1 = new OurTank(PLAYER1_X,PLAYER1_Y,Tank.DIR_UP);
         if(menuIndex==1) {
             System.out.println("new 2");
-            Player_Tank_2 = new OurTank(RUN_FRAME_WIDTH / 3 * 2, FRAME_HEIGHT - Tank.RADIUS * 2, Tank.DIR_UP);
+            Player_Tank_2 = new OurTank(PLAYER2_X, FRAME_HEIGHT - PLAYER2_Y, Tank.DIR_UP);
         }
         gameMap = new GameMap();
         sideBar = new SideBar();
@@ -487,26 +490,26 @@ public class GameFrame extends Frame implements Runnable{
 
     //敵人子彈和玩家坦克碰撞
     //玩家坦克子彈和所有敵人碰撞
-    private void bulletCollideTank(){
+    private void bulletCollideTank(Graphics g){
         //敵人坦克的子彈和玩家坦克的碰撞
         if (Player_Tank_1!=null){
             for (Tank enemy : enemies) {
-                enemy.collideBullets(Player_Tank_1.getBullets(), 0);
+                enemy.collideBullets(Player_Tank_1.getBullets(), 0,g);
             }
         }
         if (Player_Tank_1!=null){
             for (Tank enemy : enemies) {
-                Player_Tank_1.collideBullets(enemy.getBullets(), 1);
+                Player_Tank_1.collideBullets(enemy.getBullets(), 1,g);
             }
         }
         if (Player_Tank_2!=null){
             for (Tank enemy : enemies) {
-                enemy.collideBullets(Player_Tank_2.getBullets(),0);
+                enemy.collideBullets(Player_Tank_2.getBullets(),0,g);
             }
         }
         if(Player_Tank_2!=null){
             for (Tank enemy : enemies) {
-                Player_Tank_2.collideBullets(enemy.getBullets(), 2);
+                Player_Tank_2.collideBullets(enemy.getBullets(), 2,g);
             }
         }
     }

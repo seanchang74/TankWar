@@ -1,5 +1,7 @@
 package com.tankwar.utilis;
 
+import com.tankwar.tank.Tank;
+
 import java.awt.*;
 import java.net.PortUnreachableException;
 
@@ -10,7 +12,7 @@ public class Constant {
     /********************遊戲視窗相關*******************/
     public static final String GAME_TITLE = "坦克大戰1.0";
     public static final int FRAME_WIDTH = 1200;
-    public static final int FRAME_HEIGHT = 600;
+    public static final int FRAME_HEIGHT = 629;
     public static final int RUN_FRAME_WIDTH = FRAME_WIDTH*9/10;
             ;
 
@@ -45,7 +47,7 @@ public class Constant {
 
     //螢幕刷新
     public static final int REPAINT_INT = 30;
-
+    /********************遊戲運行中相關*******************/
     //最大敵人數量
     public static final int ENEMY_MAX_COUNT = 8;
     public static final int ENEMY_BORN_INTERVAL = 5000;
@@ -60,4 +62,10 @@ public class Constant {
     public static final int PLAYER2_DIE = 2;
     public static final int PLAYER_BOTH_DIE = 3;
     public static final int PLAYER_BOTH_ALIVE = 4;
+
+    //玩家出生位置
+    public static final int PLAYER1_X = RUN_FRAME_WIDTH/3;
+    public static final int PLAYER1_Y = FRAME_HEIGHT- Tank.RADIUS*2;
+    public static final int PLAYER2_X = RUN_FRAME_WIDTH / 3 * 2;
+    public static final int PLAYER2_Y = FRAME_HEIGHT - Tank.RADIUS * 2;
 }

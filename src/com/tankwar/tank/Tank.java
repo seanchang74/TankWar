@@ -24,7 +24,7 @@ public abstract  class Tank {
     public static final int DIR_LEFT = 2;
     public static final int DIR_RIGHT = 3;
     //坦克半徑
-    public static final int RADIUS = 30;
+    public static final int RADIUS = 29;
     //默認速度
     public static final int DEFAULT_SPEED = 6;
     //坦克狀態
@@ -81,12 +81,14 @@ public abstract  class Tank {
 
 
     public void draw(Graphics g,int player){
+        if(!visible)return;
         /**
          * 每楨都要執行
          */
         logic();
         drawTank(g,player);
         drawBullets(g,player);
+        if(!isEnemy)
         drawName(g);
 
     }
@@ -282,7 +284,7 @@ public abstract  class Tank {
         }
     }
     //坦克和子彈碰撞判斷
-    public void collideBullets(List<Bullet> bullets ,int player){
+    public void collideBullets(List<Bullet> bullets ,int player,Graphics g){
         //對所有子彈和坦克進行碰撞檢測
         for(Bullet bullet : bullets){
             int bulletX = bullet.getX();
@@ -295,6 +297,9 @@ public abstract  class Tank {
                 hurt(bullet,player);
                 //添加爆炸效果
                 addExplode(x+RADIUS*2,y+RADIUS*2);
+                //坦克重生
+                if(!isEnemy)
+                reborn(g,player);
             }
         }
     }
@@ -313,7 +318,7 @@ public abstract  class Tank {
         int atk = bullet.getAtk();
 
         if(!isEnemy){
-            this.setVisible(false);
+//            this.setVisible(false);
             if(player_get_hurt(player,atk) == Constant.PLAYER_BOTH_DIE)
                 gameover();
         }
@@ -326,19 +331,66 @@ public abstract  class Tank {
             }
         }
     }
+    private void reborn(Graphics g,int player){
+        this.setVisible(false);
+        if(player == 1){
+            setX(Constant.PLAYER1_X);
+            setY(Constant.PLAYER1_Y);
+        }
+        else if(player == 2){
+            setX(Constant.PLAYER2_X);
+            setY(Constant.PLAYER2_Y);
+        }
+//        born(g);
+        setVisible(true);
 
+    }
+    //出生圖片繪製
+    private static Image[] born_Image;
+    static {
+        born_Image[0] = MyUtil.createImage("res/image/material/born1.gif");
+        born_Image[1] = MyUtil.createImage("res/image/material/born2.gif");
+        born_Image[2] = MyUtil.createImage("res/image/material/born3.gif");
+        born_Image[3] = MyUtil.createImage("res/image/material/born4.gif");
+
+    }
+    private void born(Graphics g){
+        int sleep = 8000;
+        new Thread(){
+            public void run() {
+                try {
+                    for (int i = 0; i < 25000; i++) {
+                        System.out.println("I"+i);
+                        if(i%sleep<(sleep/4))
+                            g.drawImage(born_Image[0],x-RADIUS,y-RADIUS,RADIUS*2,RADIUS*2,null);
+                        else if(i%sleep<(sleep/2))
+                            g.drawImage(born_Image[1], x-RADIUS,y-RADIUS,RADIUS*2,RADIUS*2,null);
+                        else if(i%sleep<(sleep/4*3))
+                            g.drawImage(born_Image[2], x-RADIUS,y-RADIUS,RADIUS*2,RADIUS*2,null);
+                        else
+                            g.drawImage(born_Image[3], x-RADIUS,y-RADIUS,RADIUS*2,RADIUS*2,null);
+                    }
+                } catch (Exception e) { }
+            }
+        }.start();
+    }
     private static Image shield1 = MyUtil.createImage("res/image/material/shield1.png");
     private static Image shield2 = MyUtil.createImage("res/image/material/shield2.png");
-
-    private void reborn(Graphics g){
-//        new Thread(){
-//            public void run(){
-//                for (int i = 0; i < 50; ++i) {
-//                    test.randomPaint();
-//                    Thread.sleep(100);
-//                }
-//            }
-//        }.start();
+    //護盾繪製
+    private void drawshiled(Graphics g){
+        int sleep = 3000;
+        new Thread(){
+            public void run() {
+                try {
+                    for (int i = 0; i < 80000; i++) {
+                        if(i%sleep<(sleep/2))
+                            g.drawImage(shield1,x-RADIUS,y-RADIUS,65,65,null);
+                        else
+                            g.drawImage(shield2,x-RADIUS,y-RADIUS,65,65,null);
+                    }
+                } catch (Exception e) { }
+            }
+        }.start();
     }
 
     public void gameover(){
@@ -349,7 +401,6 @@ public abstract  class Tank {
         }
         else{//TODO
             //gameover
-
             GameFrame.setGameState(Constant.STATE_OVER);
             
         }
@@ -394,6 +445,7 @@ public abstract  class Tank {
                 MapTilePool.theReturn(tile);
                 //當主堡被擊毀後，1.5秒鐘之後切換到遊戲結束的畫面
                 if(tile.isHouse()){
+
                     delaySecondsToOver(1500);
                 }
             }

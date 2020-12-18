@@ -122,6 +122,7 @@ public class MapTile {
     }
 
     public boolean isHouse(){
+
         return type == TYPE_HOUSE;
     }
 }

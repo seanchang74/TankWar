@@ -66,8 +66,8 @@ public class OurTank extends Tank{
 
     public void drawTank(Graphics g,int player){
         if(player == 1)
-        g.drawImage(p1_tankImg_hp1[getDir()],getX()-RADIUS,getY()-RADIUS,60,60,null );
+        g.drawImage(p1_tankImg_hp1[getDir()],getX()-RADIUS,getY()-RADIUS,59,59,null );
         else if(player == 2)
-        g.drawImage(p2_tankImg_hp1[getDir()],getX()-RADIUS,getY()-RADIUS,60,60,null );
+        g.drawImage(p2_tankImg_hp1[getDir()],getX()-RADIUS,getY()-RADIUS,59,59,null );
     }
 }

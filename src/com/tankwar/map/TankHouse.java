@@ -26,11 +26,6 @@ public class TankHouse {
         tiles.add(new MapTile(HOUSE_X+MapTile.tileW*5/4,HOUSE_Y+MapTile.tileW*5/4));
         tiles.get(tiles.size()-1).setType(MapTile.TYPE_HOUSE);
     }
-//    public void draw(Graphics g){
-//        for (MapTile tile : tiles) {
-//            tile.draw(g);
-//        }
-//    }
 
     public List<MapTile> getTiles() {
         return tiles;
