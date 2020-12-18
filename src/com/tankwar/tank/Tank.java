@@ -346,34 +346,34 @@ public abstract  class Tank {
 
     }
     //出生圖片繪製
-    private static Image[] born_Image;
-    static {
-        born_Image[0] = MyUtil.createImage("res/image/material/born1.gif");
-        born_Image[1] = MyUtil.createImage("res/image/material/born2.gif");
-        born_Image[2] = MyUtil.createImage("res/image/material/born3.gif");
-        born_Image[3] = MyUtil.createImage("res/image/material/born4.gif");
-
-    }
-    private void born(Graphics g){
-        int sleep = 8000;
-        new Thread(){
-            public void run() {
-                try {
-                    for (int i = 0; i < 25000; i++) {
-                        System.out.println("I"+i);
-                        if(i%sleep<(sleep/4))
-                            g.drawImage(born_Image[0],x-RADIUS,y-RADIUS,RADIUS*2,RADIUS*2,null);
-                        else if(i%sleep<(sleep/2))
-                            g.drawImage(born_Image[1], x-RADIUS,y-RADIUS,RADIUS*2,RADIUS*2,null);
-                        else if(i%sleep<(sleep/4*3))
-                            g.drawImage(born_Image[2], x-RADIUS,y-RADIUS,RADIUS*2,RADIUS*2,null);
-                        else
-                            g.drawImage(born_Image[3], x-RADIUS,y-RADIUS,RADIUS*2,RADIUS*2,null);
-                    }
-                } catch (Exception e) { }
-            }
-        }.start();
-    }
+//    private static Image[] born_Image;
+//    static {
+//        born_Image[0] = MyUtil.createImage("res/image/material/born1.gif");
+//        born_Image[1] = MyUtil.createImage("res/image/material/born2.gif");
+//        born_Image[2] = MyUtil.createImage("res/image/material/born3.gif");
+//        born_Image[3] = MyUtil.createImage("res/image/material/born4.gif");
+//
+//    }
+//    private void born(Graphics g){
+//        int sleep = 8000;
+//        new Thread(){
+//            public void run() {
+//                try {
+//                    for (int i = 0; i < 25000; i++) {
+//                        System.out.println("I"+i);
+//                        if(i%sleep<(sleep/4))
+//                            g.drawImage(born_Image[0],x-RADIUS,y-RADIUS,RADIUS*2,RADIUS*2,null);
+//                        else if(i%sleep<(sleep/2))
+//                            g.drawImage(born_Image[1], x-RADIUS,y-RADIUS,RADIUS*2,RADIUS*2,null);
+//                        else if(i%sleep<(sleep/4*3))
+//                            g.drawImage(born_Image[2], x-RADIUS,y-RADIUS,RADIUS*2,RADIUS*2,null);
+//                        else
+//                            g.drawImage(born_Image[3], x-RADIUS,y-RADIUS,RADIUS*2,RADIUS*2,null);
+//                    }
+//                } catch (Exception e) { }
+//            }
+//        }.start();
+//    }
     private static Image shield1 = MyUtil.createImage("res/image/material/shield1.png");
     private static Image shield2 = MyUtil.createImage("res/image/material/shield2.png");
     //護盾繪製
