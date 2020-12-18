@@ -36,6 +36,8 @@ public class GameFrame extends Frame implements Runnable{
     public Tank Player_Tank_2;
     //敵人坦克物件池
     private List<Tank> enemies = new ArrayList<>();
+    //用來記錄本關卡產生了多少個敵人
+    private int bornEnemyCount;
     //菜單指標
     private static Image select_image = MyUtil.createImage("res/image/material/selecttank.gif");
     //icon
@@ -285,6 +287,7 @@ public class GameFrame extends Frame implements Runnable{
      * 開始新遊戲
      */
     private void newGame() {
+        bornEnemyCount = 0;
         gameState = STATE_RUN;
         //繪製坦克
         Player_Tank_1 = new OurTank(RUN_FRAME_WIDTH/3,FRAME_HEIGHT-Tank.RADIUS*2,Tank.DIR_UP);
@@ -298,9 +301,11 @@ public class GameFrame extends Frame implements Runnable{
             @Override
             public void run() {
                 while (true){
-                    if(enemies.size()< ENEMY_MAX_COUNT){
+                    if(LevelInfo.getInstance().getEnemyCount() > bornEnemyCount&&
+                        enemies.size() < ENEMY_MAX_COUNT){
                         Tank enemy = EnemyTank.createEnemy();
                         enemies.add(enemy);
+                        bornEnemyCount ++;
                     }
                     try {
                         Thread.sleep(ENEMY_BORN_INTERVAL);
