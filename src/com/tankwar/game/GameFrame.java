@@ -1,11 +1,11 @@
 package com.tankwar.game;
 import com.tankwar.map.GameMap;
-import com.tankwar.map.MapTile;
 import com.tankwar.tank.EnemyTank;
 import com.tankwar.tank.OurTank;
 import com.tankwar.tank.Tank;
-import com.tankwar.utilis.Constant;
 import com.tankwar.utilis.MyUtil;
+import com.tankwar.utilis.PlayerHandling;
+import com.tankwar.utilis.SideBar;
 
 import javax.swing.*;
 import java.awt.*;
@@ -28,6 +28,8 @@ public class GameFrame extends Frame implements Runnable{
     private static int gameState;
     //菜單被選
     private int menuIndex;
+    //結束菜單
+    private int overIndex;
     //最上方的高度
     public static int titleBarH;
     //宣告友方坦克
@@ -36,12 +38,13 @@ public class GameFrame extends Frame implements Runnable{
     //敵人坦克物件池
     private List<Tank> enemies = new ArrayList<>();
     //菜單指標
-    private static Image select_image = MyUtil.createImage("res/image/selecttank.gif");
+    private static Image select_image = MyUtil.createImage("res/image/material/selecttank.gif");
     //icon
-    private static ImageIcon icon = new ImageIcon("res/image/enemy3U.gif");
+    private static ImageIcon icon = new ImageIcon("res/image/tank/enemies/enemy3U.gif");
     //結束遊戲圖片
-    private static Image overImg = MyUtil.createImage("res/image/over.gif");
-
+    private static Image overImg = MyUtil.createImage("res/image/material/over.png");
+    //側邊攔
+    private SideBar sideBar;
     //定義地圖相關的內容
     private GameMap gameMap;
     /**
@@ -77,6 +80,7 @@ public class GameFrame extends Frame implements Runnable{
         setVisible(true);
         //上方標題的高度
         titleBarH = getInsets().top;
+        System.out.println(titleBarH);
 
     }
 
@@ -137,23 +141,33 @@ public class GameFrame extends Frame implements Runnable{
     private void drawRun(Graphics g) {
         //繪製背景
         g.setColor(Color.BLACK);
-        g.fillRect(0,0,FRAME_WIDTH,FRAME_HEIGHT);
+        g.fillRect(0,0,RUN_FRAME_WIDTH,FRAME_HEIGHT);
 
-        //繪製地圖
-        gameMap.draw(g);
-
+        //繪製側邊攔
+        sideBar.drawBackground(g);
+        sideBar.draw(g,1);
+        if (menuIndex == 1)
+            sideBar.draw(g,2);
+        //繪製地圖的碰撞層
+        gameMap.drawBk(g);
         //繪製敵人坦克
         drawEnemies(g);
         //繪製坦克
-        Player_Tank_1.draw(g,1);
+        if (Player_Tank_1!=null)
+            Player_Tank_1.draw(g,1);
         if(menuIndex ==1)
+            if(Player_Tank_2!=null)
             Player_Tank_2.draw(g,2);
+        //繪製地圖的遮擋層
+        gameMap.drawCover(g);
         //碰撞檢測
-        bulletCollideTank();
+        bulletCollideTank(g);
         //繪製爆炸
         drawExplodes(g);
         //子彈和所有地圖塊的碰撞
-        bulletCollideMapTile();
+        bulletAndTankCollideMapTile();
+        //檢測玩家死亡
+        deletePlayer();
     }
     //繪製敵人坦克，若已經死亡從中移除
     private  void drawEnemies(Graphics g){
@@ -176,22 +190,26 @@ public class GameFrame extends Frame implements Runnable{
     private void drawOver(Graphics g) {
         int imgW = overImg.getWidth(null);
         int imgH = overImg.getHeight(null);
-        int imgX = FRAME_WIDTH - imgW >>1;
+        int imgX = RUN_FRAME_WIDTH - imgW >>1;
         int imgY = FRAME_HEIGHT - imgH >>1;
-        final int DIS = 140;
+        final int DIS = 250;
         g.setColor(Color.BLACK);
-        g.fillRect(0,0,FRAME_WIDTH,FRAME_HEIGHT);
+        //想辦法解決@seanchang74 TODO
+        g.fillRect(0,0,RUN_FRAME_WIDTH,FRAME_HEIGHT);
         g.drawImage(overImg, imgX, imgY, null);
-
+        sideBar.drawBackground(g);
+        sideBar.draw(g,1);
+        if(menuIndex == 1)sideBar.draw(g,2);
         //提供選單
         for (int i = 0; i < OVER_STR.length; i++) {
             //紅色菜單
-            if(i == menuIndex){
+            if(i == overIndex){
                 g.setColor(Color.RED);
             }
             else g.setColor(Color.WHITE);
-            g.drawString(OVER_STR[i], imgX-67+DIS*i,imgY+90 );
+            g.drawString(OVER_STR[i], imgX+40+DIS*i,imgY+imgH+20 );
         }
+        System.out.println(imgX+" "+imgY);
     }
 
 
@@ -266,6 +284,9 @@ public class GameFrame extends Frame implements Runnable{
                     newGame();
                     break;
                 }
+                else if(menuIndex == MENUS.length-1){
+                    System.exit(0);
+                }
             }
         }
     }
@@ -276,12 +297,13 @@ public class GameFrame extends Frame implements Runnable{
     private void newGame() {
         gameState = STATE_RUN;
         //繪製坦克
-        Player_Tank_1 = new OurTank(FRAME_WIDTH/3,FRAME_HEIGHT-Tank.RADIUS*2,Tank.DIR_UP);
-        if(menuIndex==1)
-        Player_Tank_2 = new OurTank(FRAME_WIDTH/3*2,FRAME_HEIGHT-Tank.RADIUS*2,Tank.DIR_UP);
-
+        Player_Tank_1 = new OurTank(PLAYER1_X,PLAYER1_Y,Tank.DIR_UP);
+        if(menuIndex==1) {
+            System.out.println("new 2");
+            Player_Tank_2 = new OurTank(PLAYER2_X, FRAME_HEIGHT - PLAYER2_Y, Tank.DIR_UP);
+        }
         gameMap = new GameMap();
-
+        sideBar = new SideBar();
         //產生敵人
         new Thread(){
             @Override
@@ -310,48 +332,54 @@ public class GameFrame extends Frame implements Runnable{
     }
 
     private void keyPressedEventRun(int keyCode) {
-        switch (keyCode){
-            //玩家1
-            case KeyEvent.VK_W:
-                Player_Tank_1.setDir(Tank.DIR_UP);
-                Player_Tank_1.setStatus(Tank.STATE_MOVE);
-                break;
-            case KeyEvent.VK_S:
-                Player_Tank_1.setDir(Tank.DIR_DOWN);
-                Player_Tank_1.setStatus(Tank.STATE_MOVE);
-                break;
-            case KeyEvent.VK_A:
-                Player_Tank_1.setDir(Tank.DIR_LEFT);
-                Player_Tank_1.setStatus(Tank.STATE_MOVE);
-                break;
-            case KeyEvent.VK_D:
-                Player_Tank_1.setDir(Tank.DIR_RIGHT);
-                Player_Tank_1.setStatus(Tank.STATE_MOVE);
-                break;
-            case KeyEvent.VK_SPACE:
-                Player_Tank_1.fire();
-                break;
-
-            //玩家2
-            case KeyEvent.VK_UP:
-                Player_Tank_2.setDir(Tank.DIR_UP);
-                Player_Tank_2.setStatus(Tank.STATE_MOVE);
-                break;
-            case KeyEvent.VK_DOWN:
-                Player_Tank_2.setDir(Tank.DIR_DOWN);
-                Player_Tank_2.setStatus(Tank.STATE_MOVE);
-                break;
-            case KeyEvent.VK_LEFT:
-                Player_Tank_2.setDir(Tank.DIR_LEFT);
-                Player_Tank_2.setStatus(Tank.STATE_MOVE);
-                break;
-            case KeyEvent.VK_RIGHT:
-                Player_Tank_2.setDir(Tank.DIR_RIGHT);
-                Player_Tank_2.setStatus(Tank.STATE_MOVE);
-                break;
-            case KeyEvent.VK_ENTER:
-                Player_Tank_2.fire();
-                break;
+        //TODO 這邊要再想辦法處理
+        if(Player_Tank_1!=null){
+            switch (keyCode) {
+                //玩家1
+                case KeyEvent.VK_W:
+                    Player_Tank_1.setDir(Tank.DIR_UP);
+                    Player_Tank_1.setStatus(Tank.STATE_MOVE);
+                    break;
+                case KeyEvent.VK_S:
+                    Player_Tank_1.setDir(Tank.DIR_DOWN);
+                    Player_Tank_1.setStatus(Tank.STATE_MOVE);
+                    break;
+                case KeyEvent.VK_A:
+                    Player_Tank_1.setDir(Tank.DIR_LEFT);
+                    Player_Tank_1.setStatus(Tank.STATE_MOVE);
+                    break;
+                case KeyEvent.VK_D:
+                    Player_Tank_1.setDir(Tank.DIR_RIGHT);
+                    Player_Tank_1.setStatus(Tank.STATE_MOVE);
+                    break;
+                case KeyEvent.VK_SPACE:
+                    Player_Tank_1.fire();
+                    break;
+            }
+        }
+        if(Player_Tank_2!=null){
+            switch (keyCode) {
+                //玩家2
+                case KeyEvent.VK_UP:
+                    Player_Tank_2.setDir(Tank.DIR_UP);
+                    Player_Tank_2.setStatus(Tank.STATE_MOVE);
+                    break;
+                case KeyEvent.VK_DOWN:
+                    Player_Tank_2.setDir(Tank.DIR_DOWN);
+                    Player_Tank_2.setStatus(Tank.STATE_MOVE);
+                    break;
+                case KeyEvent.VK_LEFT:
+                    Player_Tank_2.setDir(Tank.DIR_LEFT);
+                    Player_Tank_2.setStatus(Tank.STATE_MOVE);
+                    break;
+                case KeyEvent.VK_RIGHT:
+                    Player_Tank_2.setDir(Tank.DIR_RIGHT);
+                    Player_Tank_2.setStatus(Tank.STATE_MOVE);
+                    break;
+                case KeyEvent.VK_ENTER:
+                    Player_Tank_2.fire();
+                    break;
+            }
         }
     }
     //按鍵被鬆開的處理
@@ -362,6 +390,7 @@ public class GameFrame extends Frame implements Runnable{
             case KeyEvent.VK_S:
             case KeyEvent.VK_A:
             case KeyEvent.VK_D:
+                if(Player_Tank_1!=null)
                 Player_Tank_1.setStatus(Tank.STATE_STAND);
                 break;
             //玩家2
@@ -369,6 +398,7 @@ public class GameFrame extends Frame implements Runnable{
             case KeyEvent.VK_DOWN:
             case KeyEvent.VK_LEFT:
             case KeyEvent.VK_RIGHT:
+                if(Player_Tank_2!=null)
                 Player_Tank_2.setStatus(Tank.STATE_STAND);
                 break;
         }
@@ -382,25 +412,24 @@ public class GameFrame extends Frame implements Runnable{
         switch (keyCode){
             case KeyEvent.VK_LEFT:
             case KeyEvent.VK_A:
-                if(--menuIndex<0){
-                    menuIndex=0;
+                if(--overIndex<0){
+                    overIndex=0;
                 }
                 break;
             case KeyEvent.VK_RIGHT:
             case KeyEvent.VK_D:
-                System.out.println("d");
-                if(++menuIndex>1){
-                    menuIndex=1;
+                if(++overIndex>1){
+                    overIndex=1;
                 }
                 break;
             case KeyEvent.VK_ENTER:{
                 //TODO
                 //結束遊戲
-                if(menuIndex == 0) {
+                if(overIndex == 0) {
                     System.exit(0);
                 }
                 //回到標題
-                else if(menuIndex == 1){
+                else if(overIndex == 1){
                     gameState =  STATE_MENU;
                     //重製遊戲
                     resetGame();
@@ -409,14 +438,33 @@ public class GameFrame extends Frame implements Runnable{
             }
         }
     }
+    //玩家死亡刪除玩家
+    public void deletePlayer(){
+        if(Player_Tank_1 != null) {
+            if (PlayerHandling.getHp1() == 0) {
+                if (Player_Tank_2 == null) Player_Tank_1.gameover();
+                Player_Tank_1 = null;
+                System.out.println("p1 die");
+            }
+        }
+        if(Player_Tank_2 != null) {
+            if (PlayerHandling.getHp2() == 0) {
+                if (Player_Tank_1 == null) Player_Tank_2.gameover();
+                Player_Tank_2 = null;
+                System.out.println("p2 die ");
+            }
+        }
+    }
     //重置遊戲狀態
     private void resetGame(){
         menuIndex = 0;
         //將子彈還回對象池
+        if(Player_Tank_1!=null)
         Player_Tank_1.bulletsReturn();
         if(Player_Tank_2!=null)
         Player_Tank_2.bulletsReturn();
         //刪除自己坦克
+        if(Player_Tank_1!=null)
         Player_Tank_1 = null;
         if(Player_Tank_2!=null)
         Player_Tank_2 = null;
@@ -442,39 +490,46 @@ public class GameFrame extends Frame implements Runnable{
 
     //敵人子彈和玩家坦克碰撞
     //玩家坦克子彈和所有敵人碰撞
-    private void bulletCollideTank(){
+    private void bulletCollideTank(Graphics g){
         //敵人坦克的子彈和玩家坦克的碰撞
-        for(Tank enemy : enemies){
-            enemy.collideBullets(Player_Tank_1.getBullets());
-        }
-        for (Tank enemy : enemies) {
-            Player_Tank_1.collideBullets(enemy.getBullets());
-        }
-        if (menuIndex ==1){
+        if (Player_Tank_1!=null){
             for (Tank enemy : enemies) {
-                enemy.collideBullets(Player_Tank_2.getBullets());
+                enemy.collideBullets(Player_Tank_1.getBullets(), 0,g);
             }
         }
-        for (Tank enemy : enemies) {
-            if(menuIndex == 1)
-            Player_Tank_2.collideBullets(enemy.getBullets());
+        if (Player_Tank_1!=null){
+            for (Tank enemy : enemies) {
+                Player_Tank_1.collideBullets(enemy.getBullets(), 1,g);
+            }
+        }
+        if (Player_Tank_2!=null){
+            for (Tank enemy : enemies) {
+                enemy.collideBullets(Player_Tank_2.getBullets(),0,g);
+            }
+        }
+        if(Player_Tank_2!=null){
+            for (Tank enemy : enemies) {
+                Player_Tank_2.collideBullets(enemy.getBullets(), 2,g);
+            }
         }
     }
 
     //所有的子彈和地圖塊的碰撞
-    private void bulletCollideMapTile(){
+    private void bulletAndTankCollideMapTile(){
         //自己的坦克的子彈和地圖塊的碰撞
-       Player_Tank_1.bulletsCollideMapTiles(gameMap.getTiles());
-       if(menuIndex == 1)
+        if(Player_Tank_1!=null)
+            Player_Tank_1.bulletsCollideMapTiles(gameMap.getTiles());
+        if(Player_Tank_2!=null)
             Player_Tank_2.bulletsCollideMapTiles(gameMap.getTiles());
         for (Tank enemy : enemies) {
             enemy.bulletsCollideMapTiles(gameMap.getTiles());
         }
         //坦克和地圖的碰撞
-        if(Player_Tank_1.isCollideTile(gameMap.getTiles())){
-            Player_Tank_1.back();
-        }
-        if(menuIndex == 1)
+        if(Player_Tank_1!=null)
+            if(Player_Tank_1.isCollideTile(gameMap.getTiles())){
+                Player_Tank_1.back();
+            }
+        if(Player_Tank_2!=null)
             if(Player_Tank_2.isCollideTile(gameMap.getTiles())){
                 Player_Tank_2.back();
             }
@@ -491,8 +546,9 @@ public class GameFrame extends Frame implements Runnable{
         for(Tank enemy : enemies){
             enemy.drawExplode(g);
         }
+        if(Player_Tank_1!=null)
         Player_Tank_1.drawExplode(g);
-        if(menuIndex ==1)
+        if(Player_Tank_2!=null)
         Player_Tank_2.drawExplode(g);
     }
 

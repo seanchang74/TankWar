@@ -36,11 +36,11 @@ public class MyUtil {
 
     public static final String[] Name = {
             "戰爭機器","我是大帥哥","大奶微微","湯瑪士運鈔車",
-            "櫻木花道","理工草食男","國北好小","韓國魚","卑鄙源之助",
+            "櫻木滑倒","理工草食男","國北好小","韓國魚","卑鄙源之助",
             "華碩品質","左左右右","吸加加好難","煞氣a坦克","計網不救",
             "FaFa","國北汁顏射","花花","OOQ","紅綾已燼","白夜為祭",
             "青雲成霰","伴青燈","江秋晚吟","舊人挽歌","輕斟淺醉","畫夕顏",
-            "醉清風","染初雪","映明月"
+            "醉清風","染初雪","映明月","peko","破滅魔劍","巴巴托斯"
     };
     public static final String getRandomName(){
         return Name[getRandomNumber(0,Name.length)];
@@ -58,7 +58,7 @@ public class MyUtil {
         //正方形中心點和 點的X，Y軸的距離
         int disX = Math.abs(rectX-pointX);
         int disY = Math.abs(rectY-pointY);
-        if (disX < radius && disY < radius){
+        if (disX <= radius && disY <= radius){
             return true;
         }
         else return false;
