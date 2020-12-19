@@ -184,7 +184,7 @@ public class GameFrame extends Frame implements Runnable{
     }
 
     /**
-     * 繪製遊戲結束 TODO
+     * 繪製遊戲結束
      * @param g
      */
     private void drawOver(Graphics g) {
@@ -278,7 +278,6 @@ public class GameFrame extends Frame implements Runnable{
                 }
                 break;
             case KeyEvent.VK_ENTER:{
-                //TODO
                 //開始新遊戲
                 if(menuIndex == 0 || menuIndex == 1) {
                     newGame();
@@ -300,7 +299,7 @@ public class GameFrame extends Frame implements Runnable{
         Player_Tank_1 = new OurTank(PLAYER1_X,PLAYER1_Y,Tank.DIR_UP);
         if(menuIndex==1) {
             System.out.println("new 2");
-            Player_Tank_2 = new OurTank(PLAYER2_X, FRAME_HEIGHT - PLAYER2_Y, Tank.DIR_UP);
+            Player_Tank_2 = new OurTank(PLAYER2_X, PLAYER2_Y, Tank.DIR_UP);
         }
         gameMap = new GameMap();
         sideBar = new SideBar();
@@ -332,7 +331,6 @@ public class GameFrame extends Frame implements Runnable{
     }
 
     private void keyPressedEventRun(int keyCode) {
-        //TODO 這邊要再想辦法處理
         if(Player_Tank_1!=null){
             switch (keyCode) {
                 //玩家1
@@ -405,7 +403,7 @@ public class GameFrame extends Frame implements Runnable{
     }
 
     /**
-     * 遊戲結束按鍵處理 TODO
+     * 遊戲結束按鍵處理
      * @param keyCode
      */
     private void keyPressedEventOver(int keyCode) {
@@ -423,7 +421,6 @@ public class GameFrame extends Frame implements Runnable{
                 }
                 break;
             case KeyEvent.VK_ENTER:{
-                //TODO
                 //結束遊戲
                 if(overIndex == 0) {
                     System.exit(0);

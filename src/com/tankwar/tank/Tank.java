@@ -11,6 +11,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.tankwar.utilis.Constant.STATE_RUN;
 import static com.tankwar.utilis.PlayerHandling.*;
 
 
@@ -42,12 +43,22 @@ public abstract  class Tank {
 
     //座標
     private int x,y;
+    //血量
+    private int hp;
+    //攻擊力
     private int atk;
     private int enemy_hp = MyUtil.getRandomNumber(ENEMY_MIN_HP,ENEMY_MAX_HP+1);
+    //速度
     private int speed = DEFAULT_SPEED;
+    //方向
     private int dir;
+    //現在狀態
     private int status = STATE_STAND;
+    //是否無敵
+    private boolean shield = false;
+    //隨機顏色
     private Color color;
+    //是否為敵人
     private boolean isEnemy = false;
     //是否可見
     private boolean visible = true;
@@ -74,6 +85,7 @@ public abstract  class Tank {
         //坦克攻擊力
         atk = MyUtil.getRandomNumber(ATK_MIN,ATK_MAX+1);
         //初始化坦克血量
+        if(!isEnemy)
         PlayerHandling.initTank_hp();
         //坦克名字
         name = MyUtil.getRandomName();
@@ -85,6 +97,8 @@ public abstract  class Tank {
         /**
          * 每楨都要執行
          */
+        if(player == 1)hp = getHp1();
+        else if(player == 2)hp = getHp2();
         logic();
         drawTank(g,player);
         drawBullets(g,player);
@@ -293,13 +307,15 @@ public abstract  class Tank {
             if(MyUtil.isCollide(this.x, this.y,RADIUS,bulletX,bulletY)){
                 //子彈消失
                 bullet.setVisible(false);
-                //坦克受到傷害
-                hurt(bullet,player);
-                //添加爆炸效果
-                addExplode(x+RADIUS*2,y+RADIUS*2);
-                //坦克重生
-                if(!isEnemy)
-                reborn(g,player);
+                if(!shield){
+                    //坦克受到傷害
+                    hurt(bullet,player);
+                    //添加爆炸效果
+                    addExplode(x+RADIUS*2,y+RADIUS*2);
+                    //坦克重生
+                    if(!isEnemy && hp!=1)
+                        reborn(g,player);
+                }
             }
         }
     }
@@ -318,7 +334,6 @@ public abstract  class Tank {
         int atk = bullet.getAtk();
 
         if(!isEnemy){
-//            this.setVisible(false);
             if(player_get_hurt(player,atk) == Constant.PLAYER_BOTH_DIE)
                 gameover();
         }
@@ -331,35 +346,35 @@ public abstract  class Tank {
             }
         }
     }
+    //坦克重生
     private void reborn(Graphics g,int player){
-        this.setVisible(false);
+        born(g,player);
         if(player == 1){
-            setX(Constant.PLAYER1_X);
-            setY(Constant.PLAYER1_Y);
+            this.setX(Constant.PLAYER1_X);
+            this.setY(Constant.PLAYER1_Y);
         }
         else if(player == 2){
-            setX(Constant.PLAYER2_X);
-            setY(Constant.PLAYER2_Y);
+            this.setX(Constant.PLAYER2_X);
+            this.setY(Constant.PLAYER2_Y);
         }
-//        born(g);
-        setVisible(true);
-
     }
     //出生圖片繪製
     private static Image[] born_Image;
     static {
+        born_Image = new Image[4];
         born_Image[0] = MyUtil.createImage("res/image/material/born1.gif");
         born_Image[1] = MyUtil.createImage("res/image/material/born2.gif");
         born_Image[2] = MyUtil.createImage("res/image/material/born3.gif");
         born_Image[3] = MyUtil.createImage("res/image/material/born4.gif");
-
     }
-    private void born(Graphics g){
-        int sleep = 8000;
-        new Thread(){
+    //TODO
+    public void born(Graphics g,int player){
+        int sleep = 10000;
+        this.setVisible(false);
+        Thread b =  new Thread(){
             public void run() {
                 try {
-                    for (int i = 0; i < 25000; i++) {
+                    for (int i = 0; i < 80000; i++) {
                         System.out.println("I"+i);
                         if(i%sleep<(sleep/4))
                             g.drawImage(born_Image[0],x-RADIUS,y-RADIUS,RADIUS*2,RADIUS*2,null);
@@ -369,24 +384,42 @@ public abstract  class Tank {
                             g.drawImage(born_Image[2], x-RADIUS,y-RADIUS,RADIUS*2,RADIUS*2,null);
                         else
                             g.drawImage(born_Image[3], x-RADIUS,y-RADIUS,RADIUS*2,RADIUS*2,null);
+                        if(i == 79999){
+                            setVisible(true);
+                            if(!isEnemy)
+                            drawshield(g,player);
+                        }
+                        //只在遊戲進行中執行
+                        if(GameFrame.getGameState() != STATE_RUN){
+                            break;
+                        }
                     }
                 } catch (Exception e) { }
             }
-        }.start();
+        };
+        b.start();
     }
     private static Image shield1 = MyUtil.createImage("res/image/material/shield1.png");
     private static Image shield2 = MyUtil.createImage("res/image/material/shield2.png");
     //護盾繪製
-    private void drawshiled(Graphics g){
+    private void drawshield(Graphics g, int player){
         int sleep = 3000;
         new Thread(){
             public void run() {
                 try {
+                    //呈現閃爍效果
                     for (int i = 0; i < 80000; i++) {
+                        shield = true;
                         if(i%sleep<(sleep/2))
                             g.drawImage(shield1,x-RADIUS,y-RADIUS,65,65,null);
                         else
                             g.drawImage(shield2,x-RADIUS,y-RADIUS,65,65,null);
+                        //護盾消失
+                        if(i==79999)shield = false;
+                        //只在遊戲進行中執行
+                        if(GameFrame.getGameState() != STATE_RUN){
+                            break;
+                        }
                     }
                 } catch (Exception e) { }
             }
@@ -399,13 +432,13 @@ public abstract  class Tank {
             //歸還物件池
             EnemyTanksPool.theReturn(this);
         }
-        else{//TODO
+        else{
             //gameover
-            GameFrame.setGameState(Constant.STATE_OVER);
+            delaySecondsToOver(3000);
             
         }
     }
-
+    //敵人坦克死亡判斷
     public boolean isDie(){
         return enemy_hp <=0;
     }
@@ -419,7 +452,7 @@ public abstract  class Tank {
             for (Explode explode : explodes) {
                 explode.draw(g);
             }
-//        將不可見的爆炸效果刪除
+            //將不可見的爆炸效果刪除
             for (int i = 0; i < explodes.size(); i++) {
                 Explode explode = explodes.get(i);
                 if (!explode.isVisible()) {
