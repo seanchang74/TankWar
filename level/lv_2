@@ -1,12 +1,13 @@
 #第一關的關卡訊息，關卡訊息中間不要有空格
 #設定敵人數量
-enemyCount=3
+enemyCount=4
 #地圖生成的方式通過調用哪個方法生成
-method=addRow
+method=addCol
 #該方法調用幾次
-invokeCount=5
+invokeCount=8
 #方法調用的?次的提供參數
 #int startx,int starty,int endx,int type,final int DIS
+#int startx,int starty,int endy,int type,final int DIS
 #0,從地圖的左上角開始,0代表的是邊界，大於0的值都是地圖元素塊的寬度的元素
 #public static final int TYPE_NORMAL = 0;
 #public static final int TYPE_HOUSE = 1;
@@ -14,9 +15,12 @@ invokeCount=5
 #public static final int TYPE_STEELS = 3;
 #public static final int TYPE_GRASS = 4;
 #public static final int TYPE_WATER = 5;
-param1=0,0,0,0,1
-param2=0,1,0,0,1
-param3=0,2,0,0,1
-param4=2,4,2,3,0
-param5=0,6,0,4,1
+param1=0,0,0,4,1
+param2=2,0,0,5,0
+param3=4,0,0,3,2
+param4=6,0,0,0,1
+param5=8,0,0,0,1
+param6=10,0,0,3,2
+param7=12,0,0,5,0
+param8=14,0,0,4,1
 

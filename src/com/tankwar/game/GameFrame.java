@@ -5,16 +5,19 @@ import com.tankwar.tank.EnemyTank;
 import com.tankwar.tank.OurTank;
 import com.tankwar.tank.Tank;
 import com.tankwar.utilis.Constant;
+import com.tankwar.utilis.MusicUtil;
 import com.tankwar.utilis.MyUtil;
 import com.tankwar.utilis.SideBar;
 
 import javax.swing.*;
+import java.applet.AudioClip;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,16 +31,21 @@ public class GameFrame extends Frame implements Runnable{
     //遊戲狀態
     private static int gameState;
     //菜單被選
-    private int menuIndex;
+    private static int menuIndex;
     //最上方的高度
     public static int titleBarH;
+    //設定遊戲音樂
+    static AudioClip startmusic = MusicUtil.createAudioClip(new File("res/audio/start.wav"));
+
     //宣告友方坦克
-    public Tank Player_Tank_1;
-    public Tank Player_Tank_2;
+    public  static Tank Player_Tank_1;
+    public static Tank Player_Tank_2;
     //敵人坦克物件池
-    private List<Tank> enemies = new ArrayList<>();
+    private static List<Tank> enemies = new ArrayList<>();
     //用來記錄本關卡產生了多少個敵人
-    private int bornEnemyCount;
+    private static int bornEnemyCount;
+    //用來記錄消滅多少敵人
+    public static int killEnemyCount;
     //菜單指標
     private static Image select_image = MyUtil.createImage("res/image/material/selecttank.gif");
     //icon
@@ -45,9 +53,9 @@ public class GameFrame extends Frame implements Runnable{
     //結束遊戲圖片
     private static Image overImg = MyUtil.createImage("res/image/material/over.gif");
     //側邊攔
-    private SideBar sideBar;
+    private static SideBar sideBar;
     //定義地圖相關的內容
-    private GameMap gameMap;
+    private static GameMap gameMap = new GameMap();
     /**
      *  對視窗進行初始化
      */
@@ -57,6 +65,14 @@ public class GameFrame extends Frame implements Runnable{
         initEventListener();
         new Thread(this).start();
     }
+
+    /**
+     * 進入下一關的方法
+     */
+    public static void nextLevel() {
+        startGame(LevelInfo.getInstance().getLevel()+1);
+    }
+
     /**
      * 遊戲狀態初始化
      */
@@ -81,7 +97,6 @@ public class GameFrame extends Frame implements Runnable{
         setVisible(true);
         //上方標題的高度
         titleBarH = getInsets().top;
-
     }
 
     /**
@@ -105,6 +120,10 @@ public class GameFrame extends Frame implements Runnable{
             case STATE_OVER:
                 drawOver(g);
                 break;
+            case STATE_WIN:
+                drawWin(g);
+                break;
+
 
         }
         //再畫到系統上
@@ -137,6 +156,18 @@ public class GameFrame extends Frame implements Runnable{
         }
     }
     private void drawHelp(Graphics g) {
+    }
+
+    /**
+     * 繪製遊戲勝利的介面
+     * @param g
+     */
+    private void drawWin(Graphics g){
+        drawOver(g);
+        //通關文字
+        g.setColor(Color.white);
+        g.setFont(FONT);
+        g.drawString("遊戲通關 !",FRAME_WIDTH/2-20,50+titleBarH);
     }
     private void drawRun(Graphics g) {
         //繪製背景
@@ -237,7 +268,9 @@ public class GameFrame extends Frame implements Runnable{
                     case STATE_OVER:
                         keyPressedEventOver(keyCode);
                         break;
-
+                    case STATE_WIN:
+                        keyPressedEventWin(keyCode);
+                        break;
                 }
             }
 
@@ -252,6 +285,11 @@ public class GameFrame extends Frame implements Runnable{
                 }
             }
         });
+    }
+
+    //遊戲通關的按鍵處理
+    private void keyPressedEventWin(int keyCode) {
+        keyPressedEventOver(keyCode);
     }
 
 
@@ -273,7 +311,7 @@ public class GameFrame extends Frame implements Runnable{
                 //TODO
                 //開始新遊戲
                 if(menuIndex == 0 || menuIndex == 1) {
-                    newGame();
+                    startGame(3);
                     break;
                 }
                 else if(menuIndex == MENUS.length-1){
@@ -285,16 +323,24 @@ public class GameFrame extends Frame implements Runnable{
 
     /**
      * 開始新遊戲
+     * 並加載level關卡訊息
      */
-    private void newGame() {
+    private static void startGame(int level) {
+        startmusic.play();
+        enemies.clear();
+        if(gameMap == null)
+            gameMap = new GameMap();
+        gameMap.initMap(level);
         bornEnemyCount = 0;
+        killEnemyCount = 0;
         gameState = STATE_RUN;
         //繪製坦克
         Player_Tank_1 = new OurTank(RUN_FRAME_WIDTH/3,FRAME_HEIGHT-Tank.RADIUS*2,Tank.DIR_UP);
+        Tank.tanks.add(Player_Tank_1);
         if(menuIndex==1)
         Player_Tank_2 = new OurTank(RUN_FRAME_WIDTH/3*2,FRAME_HEIGHT-Tank.RADIUS*2,Tank.DIR_UP);
+        Tank.tanks.add(Player_Tank_2);
 
-        gameMap = new GameMap();
         sideBar = new SideBar();
         //產生敵人
         new Thread(){
@@ -427,6 +473,7 @@ public class GameFrame extends Frame implements Runnable{
     }
     //重置遊戲狀態
     private void resetGame(){
+        killEnemyCount = 0;
         menuIndex = 0;
         //將子彈還回對象池
         Player_Tank_1.bulletsReturn();
@@ -458,23 +505,36 @@ public class GameFrame extends Frame implements Runnable{
 
     //敵人子彈和玩家坦克碰撞
     //玩家坦克子彈和所有敵人碰撞
-    private void bulletCollideTank(){
+    private void bulletCollideTank() {
         //敵人坦克的子彈和玩家坦克的碰撞
-        for(Tank enemy : enemies){
+        for (Tank enemy : enemies) {
             enemy.collideBullets(Player_Tank_1.getBullets());
         }
         for (Tank enemy : enemies) {
             Player_Tank_1.collideBullets(enemy.getBullets());
         }
-        if (menuIndex ==1){
+        if (menuIndex == 1) {
             for (Tank enemy : enemies) {
                 enemy.collideBullets(Player_Tank_2.getBullets());
             }
         }
         for (Tank enemy : enemies) {
-            if(menuIndex == 1)
-            Player_Tank_2.collideBullets(enemy.getBullets());
+            if (menuIndex == 1)
+                Player_Tank_2.collideBullets(enemy.getBullets());
         }
+        //坦克和坦克的碰撞
+//        if (Player_Tank_1.isCollideTank(Tank.getTanks())) {
+//            Player_Tank_1.back();
+//        }
+//        if (menuIndex == 1)
+//            if (Player_Tank_2.isCollideTank(Tank.getTanks())) {
+//                Player_Tank_2.back();
+//            }
+//        for (Tank enemy : enemies) {
+//            if (enemy.isCollideTank(Tank.getTanks())) {
+//                enemy.back();
+//            }
+//        }
     }
 
     //所有的子彈和地圖塊的碰撞
@@ -518,5 +578,25 @@ public class GameFrame extends Frame implements Runnable{
 
     public static void setGameState(int gameState) {
         GameFrame.gameState = gameState;
+    }
+
+    /**
+     * 是否為最後一關
+     * @return
+     */
+    public static boolean isLastLevel(){
+        //當前關卡和總關卡一致
+        int currlevel = LevelInfo.getInstance().getLevel();
+        int levelCount = GameInfo.getLevelCount();
+        return currlevel == levelCount;
+        }
+
+    /**
+     * 判斷是否過關了
+     * @return
+     */
+    public static boolean isCrossLevel(){
+        //消滅敵人的數量和關卡的敵人數量一致
+        return killEnemyCount == LevelInfo.getInstance().getEnemyCount();
     }
 }

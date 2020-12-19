@@ -59,6 +59,7 @@ public class EnemyTank extends Tank{
         enemy.setDir(dir);
         enemy.setEnemy(true);
         enemy.setStatus(STATE_MOVE);
+        Tank.tanks.add(enemy);
         return enemy;
     }
 

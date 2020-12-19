@@ -19,24 +19,23 @@ import java.util.Properties;
  */
 public class GameMap {
 
-    public static final int MAP_X = Tank.RADIUS*3;
-    public static final int MAP_Y = Tank.RADIUS*3 + GameFrame.titleBarH;
-    public static final int MAP_WIDTH = Constant.RUN_FRAME_WIDTH - Tank.RADIUS*6;
-    public static final int MAP_HEIGHT = Constant.FRAME_HEIGHT - Tank.RADIUS*8-GameFrame.titleBarH;
+    public static final int MAP_X = Tank.RADIUS*2;
+    public static final int MAP_Y = Tank.RADIUS*2 + GameFrame.titleBarH;
+    public static final int MAP_WIDTH = Constant.RUN_FRAME_WIDTH - Tank.RADIUS*2;
+    public static final int MAP_HEIGHT = Constant.FRAME_HEIGHT - Tank.RADIUS*6-GameFrame.titleBarH;
 
     //地圖元素塊的容器
     private List<MapTile> tiles = new ArrayList<>();
 
     //繪製主堡
     private TankHouse house;
-    public GameMap() {
-        initMap(1);
-    }
+    public GameMap() {}
 
     /**
      * 初始化地圖元素塊,level:第幾關
      */
-    private void initMap(int level){
+    public void initMap(int level){
+        tiles.clear();
         try{
             loadLevel(level);
         }catch (Exception e) {
@@ -82,24 +81,21 @@ public class GameMap {
             //獲得每一行方法的參數，解析
             String[] split = param.split(",");
             int[] arr = new int[split.length];
-//            int i = 0;
             for (int i = 0; i < split.length; i++) {
                 arr[i] = Integer.parseInt(split[i]);
             }
             //塊之間的間隔是地圖塊的倍數
             final int DIS = MapTile.tileW;
-            //解析最後一個double值
-            int dis = (int)(Double.parseDouble(split[4])*DIS);
             //TODO
             switch (methodName){
                 case "addRow":
-                    addRow(MAP_X+arr[0]*DIS,MAP_Y+arr[1]*DIS,MAP_X+MAP_WIDTH-arr[2]*DIS,arr[3],dis);
+                    addRow(MAP_X+arr[0]*DIS,MAP_Y+arr[1]*DIS,MAP_X+MAP_WIDTH-arr[2]*DIS,arr[3],arr[4]*DIS);
                     break;
                 case "addCol":
-                    addCol(MAP_X+arr[0]*DIS,MAP_Y+arr[1]*DIS,MAP_Y+MAP_HEIGHT-arr[2]*DIS,arr[3],dis);
+                    addCol(MAP_X+arr[0]*DIS,MAP_Y+arr[1]*DIS,MAP_Y+MAP_HEIGHT-arr[2]*DIS,arr[3],arr[4]*DIS);
                     break;
                 case "addRect":
-                    addRect(MAP_X+arr[0]*DIS,MAP_Y+arr[1]*DIS,MAP_X+MAP_WIDTH-arr[2]*DIS,MAP_Y+MAP_HEIGHT-arr[3]*DIS,arr[4],dis);
+                    addRect(MAP_X+arr[0]*DIS,MAP_Y+arr[1]*DIS,MAP_X+MAP_WIDTH-arr[2]*DIS,MAP_Y+MAP_HEIGHT-arr[3]*DIS,arr[4],arr[5]*DIS);
                     break;
             }
         }
@@ -209,6 +205,5 @@ public class GameMap {
         for (int i = 0; i < rows; i++) {
             addRow(startx,starty+i*(MapTile.tileW + DIS),endx,type,DIS);
         }
-//        int cols = (endx - startx) / (MapTile.tileW + DIS);
     }
 }

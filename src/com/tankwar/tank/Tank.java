@@ -7,7 +7,9 @@ import com.tankwar.game.GameFrame;
 import com.tankwar.map.MapTile;
 import com.tankwar.utilis.*;
 
+import java.applet.AudioClip;
 import java.awt.*;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,6 +40,7 @@ public abstract  class Tank {
     public static final int ATK_MIN = 1;
     public static final int ATK_MAX = 1;
 
+
     //座標
     private int x,y;
     private int atk;
@@ -48,8 +51,13 @@ public abstract  class Tank {
     private int status = STATE_STAND;
     private Color color;
     private boolean isEnemy = false;
+    //坦克發射子彈音效
+    static AudioClip firemusic = MusicUtil.createAudioClip(new File("res/audio/fire.wav"));
+    static AudioClip blastmusic = MusicUtil.createAudioClip(new File("res/audio/blast.wav"));
+    static AudioClip hitmusic = MusicUtil.createAudioClip(new File("res/audio/hit.wav"));
 
-
+    //坦克容器
+    public static List<Tank> tanks = new ArrayList<>();
     //砲彈容器
     private List<Bullet> bullets = new ArrayList();
     //爆炸效果容器
@@ -219,6 +227,7 @@ public abstract  class Tank {
         this.enemy_hp = enemy_hp;
     }
 
+    public static List<Tank> getTanks(){ return tanks; }
     //上一次開火的時間
     private long fireTime;
     //子彈發射的最小的間隔
@@ -240,6 +249,9 @@ public abstract  class Tank {
 
             //發射子彈之後，紀錄本次發射的時間
             fireTime = System.currentTimeMillis();
+            if (firemusic!=null)
+                firemusic.play();
+
         }
    }
 
@@ -291,6 +303,7 @@ public abstract  class Tank {
         explode.setY(y);
         explode.setVisible(true);
         explode.setIndex(0);
+        blastmusic.play();
         explodes.add(explode);
     }
 
@@ -306,6 +319,7 @@ public abstract  class Tank {
         }
         if(isEnemy){
             enemy_hp -=atk;
+            hitmusic.play();
             if(enemy_hp <= 0){
                 enemy_hp =0;
                 die();
@@ -316,11 +330,24 @@ public abstract  class Tank {
 
     private void die(){
         //敵人死了
-        if(isEnemy){
+        if(isEnemy) {
+            GameFrame.killEnemyCount++;
             //歸還物件池
             EnemyTanksPool.theReturn(this);
-        }
-        else{
+            Tank.tanks.remove(this);
+            //本關是否結束 TODO
+            if (GameFrame.isCrossLevel()) {
+                //判斷遊戲是否通關?
+                if (GameFrame.isLastLevel()) {
+                    //通關了
+                    GameFrame.setGameState(Constant.STATE_WIN);
+                    Tank.tanks.clear();
+                } else {
+                    //進入下一關
+                    GameFrame.nextLevel();
+                }
+            }
+        }else{
             delaySecondsToOver(1500);
         }
     }
@@ -398,6 +425,7 @@ public abstract  class Tank {
                 }catch (InterruptedException e){
                     e.printStackTrace();
                 }
+                Tank.tanks.clear();
                 GameFrame.setGameState(Constant.STATE_OVER);
             }
         }.start();
@@ -474,6 +502,71 @@ public abstract  class Tank {
         return false;
     }
 
+    //TODO
+    public boolean isCollideTank(List<Tank> tanks){
+        for (Tank tank : tanks) {
+            if(tank == this)
+                continue;
+            //點-1 左上角
+            int tankX = tank.getX();
+            int tankY = tank.getY();
+            boolean collide = MyUtil.isCollide(x, y, RADIUS, tankX, tankY);
+            //如果碰上了就直接返回，否則繼續判斷下一個點
+            if(collide){
+                return true;
+            }
+            //點-2 中上點
+            tankX += MapTile.radius;
+            collide = MyUtil.isCollide(x, y, RADIUS, tankX, tankY);
+            //如果碰上了就直接返回，否則繼續判斷下一個點
+            if(collide){
+                return true;
+            }
+            //點-3 右上角
+            tankX += MapTile.radius;
+            collide = MyUtil.isCollide(x, y, RADIUS, tankX, tankY);
+            //如果碰上了就直接返回，否則繼續判斷下一個點
+            if(collide){
+                return true;
+            }
+            //點-4 中右點
+            tankY += MapTile.radius;
+            collide = MyUtil.isCollide(x, y, RADIUS, tankX, tankY);
+            //如果碰上了就直接返回，否則繼續判斷下一個點
+            if(collide){
+                return true;
+            }
+            //點-5 右下角
+            tankY += MapTile.radius;
+            collide = MyUtil.isCollide(x, y, RADIUS, tankX, tankY);
+            //如果碰上了就直接返回，否則繼續判斷下一個點
+            if(collide){
+                return true;
+            }
+            //點-6 中下點
+            tankX -= MapTile.radius;
+            collide = MyUtil.isCollide(x, y, RADIUS, tankX, tankY);
+            //如果碰上了就直接返回，否則繼續判斷下一個點
+            if(collide){
+                return true;
+            }
+            //點-7 左下角
+            tankX -= MapTile.radius;
+            collide = MyUtil.isCollide(x, y, RADIUS, tankX, tankY);
+            //如果碰上了就直接返回，否則繼續判斷下一個點
+            if(collide){
+                return true;
+            }
+            //點-8 中左點
+            tankY -= MapTile.radius;
+            collide = MyUtil.isCollide(x, y, RADIUS, tankX, tankY);
+            //如果碰上了就直接返回，否則繼續判斷下一個點
+            if(collide){
+                return true;
+            }
+        }
+        return false;
+    }
     /**
      * 坦克回退的方法
      */

@@ -1,6 +1,7 @@
 package com.tankwar.utilis;
 
 import java.awt.*;
+import java.io.IOException;
 import java.net.PortUnreachableException;
 
 /*
@@ -27,11 +28,11 @@ public class Constant {
     public  static final int STATE_HELP = 1;
     public  static final int STATE_RUN = 2;
     public  static final int STATE_OVER = 3;
+    public  static final int STATE_WIN = 4;
 
     public static final String[] MENUS = {
             "1 PLAYER(未實裝)",
             "2 PLAYERS",
-            "CONTINUE(未實裝)",
             "關於",
             "退出遊戲",
     };
@@ -40,6 +41,7 @@ public class Constant {
             "退出遊戲",
             "返回標題",
     };
+
     // 字體設定
     public  static final Font FONT = new Font("微軟正黑體",Font.BOLD,20);
     public  static final Font NAME_FONT = new Font("微軟正黑體",Font.BOLD,15);
@@ -55,4 +57,5 @@ public class Constant {
     public static final int ENEMY_AI_INTERVAL = 1500;
     //AI開火機率
     public static final double ENEMY_FIRE_CHANGE = 0.05;
+
 }
