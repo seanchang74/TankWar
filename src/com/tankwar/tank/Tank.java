@@ -13,6 +13,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.tankwar.utilis.Constant.STATE_RUN;
+import static com.tankwar.utilis.PlayerHandling.*;
+
 
 /**
  * 坦克相關class
@@ -24,15 +27,15 @@ public abstract  class Tank {
     public static final int DIR_LEFT = 2;
     public static final int DIR_RIGHT = 3;
     //坦克半徑
-    public static final int RADIUS = 30;
+    public static final int RADIUS = 29;
     //默認速度
     public static final int DEFAULT_SPEED = 6;
     //坦克狀態
     public static final int STATE_STAND = 0;
     public static final int STATE_MOVE = 1;
     public static final int STATE_DIE = 2;
-    //坦克初始血量
-    public static final int DEFAULT_HP = 5;
+    //坦克名字
+    private String name;
     //敵人坦克血量
     public static final int ENEMY_MIN_HP = 1;
     public static final int ENEMY_MAX_HP = 3;
@@ -43,19 +46,31 @@ public abstract  class Tank {
 
     //座標
     private int x,y;
+    //血量
+    private int hp;
+    //攻擊力
     private int atk;
-    private static int hp = DEFAULT_HP;
     private int enemy_hp = MyUtil.getRandomNumber(ENEMY_MIN_HP,ENEMY_MAX_HP+1);
+    //速度
     private int speed = DEFAULT_SPEED;
+    //方向
     private int dir;
+    //現在狀態
     private int status = STATE_STAND;
+    //是否無敵
+    private boolean shield = false;
+    //隨機顏色
     private Color color;
+    //是否為敵人
     private boolean isEnemy = false;
+    //是否可見
+    private boolean visible = true;
+
+
     //坦克發射子彈音效
     static AudioClip firemusic = MusicUtil.createAudioClip(new File("res/audio/fire.wav"));
     static AudioClip blastmusic = MusicUtil.createAudioClip(new File("res/audio/blast.wav"));
     static AudioClip hitmusic = MusicUtil.createAudioClip(new File("res/audio/hit.wav"));
-
     //坦克容器
     public static List<Tank> tanks = new ArrayList<>();
     //砲彈容器
@@ -74,25 +89,40 @@ public abstract  class Tank {
         initTank();
     }
 
-    private void initTank(){
+    public void initTank(){
         color = MyUtil.getRandomColor();
-        atk = MyUtil.getRandomNumber(ATK_MIN,ATK_MAX);
-        hp = DEFAULT_HP;
+        //坦克攻擊力
+        atk = MyUtil.getRandomNumber(ATK_MIN,ATK_MAX+1);
+        //初始化坦克血量
+        if(!isEnemy)
+        PlayerHandling.initTank_hp();
         //坦克名字
-        String name = MyUtil.getRandomName();
+        name = MyUtil.getRandomName();
     }
 
 
     public void draw(Graphics g,int player){
+        if(!visible)return;
         /**
          * 每楨都要執行
          */
+        if(player == 1)hp = getHp1();
+        else if(player == 2)hp = getHp2();
         logic();
         drawTank(g,player);
         drawBullets(g,player);
-        drawLife(g,player);
+        if(!isEnemy)
+        drawName(g);
 
     }
+
+
+    private void drawName(Graphics g) {
+        g.setColor(color);
+        g.setFont(Constant.NAME_FONT);
+        g.drawString(name,x - RADIUS,y-35);
+    }
+
     /**
      * 繪製坦克
      * @param g
@@ -160,12 +190,6 @@ public abstract  class Tank {
     public void setY(int y){
         this.y = y;
     }
-    public static int getHp(){
-        return hp;
-    }
-    public void setHp(int hp){
-        this.hp = hp;
-    }
     public int getAtk(){
         return atk;
     }
@@ -193,6 +217,14 @@ public abstract  class Tank {
 
     public void setStatus(int status) {
         this.status = status;
+    }
+
+    public boolean isVisible() {
+        return visible;
+    }
+
+    public void setVisible(boolean visible) {
+        this.visible = visible;
     }
 
     public Color getColor() {
@@ -251,7 +283,6 @@ public abstract  class Tank {
             fireTime = System.currentTimeMillis();
             if (firemusic!=null)
                 firemusic.play();
-
         }
    }
 
@@ -279,7 +310,7 @@ public abstract  class Tank {
         }
     }
     //坦克和子彈碰撞判斷
-    public void collideBullets(List<Bullet> bullets){
+    public void collideBullets(List<Bullet> bullets ,int player,Graphics g){
         //對所有子彈和坦克進行碰撞檢測
         for(Bullet bullet : bullets){
             int bulletX = bullet.getX();
@@ -288,34 +319,36 @@ public abstract  class Tank {
             if(MyUtil.isCollide(this.x, this.y,RADIUS,bulletX,bulletY)){
                 //子彈消失
                 bullet.setVisible(false);
-                //坦克受到傷害
-                hurt(bullet);
-                //添加爆炸效果
-                addExplode(x+RADIUS*2,y+RADIUS*2);
+                if(!shield){
+                    //坦克受到傷害
+                    hurt(bullet,player);
+                    //添加爆炸效果
+                    addExplode(x+RADIUS*2,y+RADIUS*2);
+                    //坦克重生
+                    if(!isEnemy && hp!=1)
+                        reborn(g,player);
+                }
             }
         }
     }
 
-    private void addExplode(int x,int y){
-        //添加爆炸效果，以及當前被擊中坦克的座標
-        Explode explode = ExplodesPool.get();
-        explode.setX(x);
-        explode.setY(y);
-        explode.setVisible(true);
-        explode.setIndex(0);
-        blastmusic.play();
-        explodes.add(explode);
+    private void addExplode(int x,int y){//添加爆炸效果，以及當前被擊中坦克的座標
+            Explode explode = ExplodesPool.get();
+            explode.setX(x);
+            explode.setY(y);
+            explode.setVisible(true);
+            explode.setIndex(0);
+            blastmusic.play();
+            explodes.add(explode);
     }
 
     //坦克受傷
-    private void hurt(Bullet bullet){
+    private void hurt(Bullet bullet,int player){
         int atk = bullet.getAtk();
+
         if(!isEnemy){
-            hp -= atk;
-            if (hp <= 0) {
-                hp = 0;
+            if(player_get_hurt(player,atk) == Constant.PLAYER_BOTH_DIE)
                 die();
-            }
         }
         if(isEnemy){
             enemy_hp -=atk;
@@ -327,8 +360,87 @@ public abstract  class Tank {
             }
         }
     }
+    //坦克重生
+    private void reborn(Graphics g,int player){
+        born(g,player);
+        if(player == 1){
+            this.setX(Constant.PLAYER1_X);
+            this.setY(Constant.PLAYER1_Y);
+        }
+        else if(player == 2){
+            this.setX(Constant.PLAYER2_X);
+            this.setY(Constant.PLAYER2_Y);
+        }
+    }
+    //出生圖片繪製
+    private static Image[] born_Image;
+    static {
+        born_Image = new Image[4];
+        born_Image[0] = MyUtil.createImage("res/image/material/born1.gif");
+        born_Image[1] = MyUtil.createImage("res/image/material/born2.gif");
+        born_Image[2] = MyUtil.createImage("res/image/material/born3.gif");
+        born_Image[3] = MyUtil.createImage("res/image/material/born4.gif");
+    }
+    //TODO
+    public void born(Graphics g,int player){
+        int sleep = 10000;
+        this.setVisible(false);
+        Thread b =  new Thread(){
+            public void run() {
+                try {
+                    for (int i = 0; i < 80000; i++) {
+                        System.out.println("I"+i);
+                        if(i%sleep<(sleep/4))
+                            g.drawImage(born_Image[0],x-RADIUS,y-RADIUS,RADIUS*2,RADIUS*2,null);
+                        else if(i%sleep<(sleep/2))
+                            g.drawImage(born_Image[1], x-RADIUS,y-RADIUS,RADIUS*2,RADIUS*2,null);
+                        else if(i%sleep<(sleep/4*3))
+                            g.drawImage(born_Image[2], x-RADIUS,y-RADIUS,RADIUS*2,RADIUS*2,null);
+                        else
+                            g.drawImage(born_Image[3], x-RADIUS,y-RADIUS,RADIUS*2,RADIUS*2,null);
+                        if(i == 79999){
+                            setVisible(true);
+                            if(!isEnemy)
+                            drawshield(g,player);
+                        }
+                        //只在遊戲進行中執行
+                        if(GameFrame.getGameState() != STATE_RUN){
+                            break;
+                        }
+                    }
+                } catch (Exception e) { }
+            }
+        };
+        b.start();
+    }
+    private static Image shield1 = MyUtil.createImage("res/image/material/shield1.png");
+    private static Image shield2 = MyUtil.createImage("res/image/material/shield2.png");
+    //護盾繪製
+    private void drawshield(Graphics g, int player){
+        int sleep = 3000;
+        new Thread(){
+            public void run() {
+                try {
+                    //呈現閃爍效果
+                    for (int i = 0; i < 80000; i++) {
+                        shield = true;
+                        if(i%sleep<(sleep/2))
+                            g.drawImage(shield1,x-RADIUS,y-RADIUS,65,65,null);
+                        else
+                            g.drawImage(shield2,x-RADIUS,y-RADIUS,65,65,null);
+                        //護盾消失
+                        if(i==79999)shield = false;
+                        //只在遊戲進行中執行
+                        if(GameFrame.getGameState() != STATE_RUN){
+                            break;
+                        }
+                    }
+                } catch (Exception e) { }
+            }
+        }.start();
+    }
 
-    private void die(){
+    public void die(){
         //敵人死了
         if(isEnemy) {
             GameFrame.killEnemyCount++;
@@ -351,44 +463,29 @@ public abstract  class Tank {
             delaySecondsToOver(1500);
         }
     }
-
+    //敵人坦克死亡判斷
     public boolean isDie(){
         return enemy_hp <=0;
     }
 
-    private static final int SIDEBAR_X = Constant.RUN_FRAME_WIDTH;
-    //玩家血量圖片
-    private static Image life = MyUtil.createImage("res/image/material/life.png");
-    //繪製血量
-    //todo 畫血量需再調整
-    private void drawLife(Graphics g,int player){
-        g.setColor(Color.BLACK);
-        if(player !=0)
-        g.drawString("P"+player+" HP",SIDEBAR_X,0+Constant.FRAME_HEIGHT*2/3+60*(player-1));
-        for (int i = 0; i < hp; i++) {
-            g.drawImage(life,SIDEBAR_X+30*i,0+Constant.FRAME_HEIGHT*2/3,25,25,null);
-        }
-    }
+
     /**
      * 繪製當前坦克上所有的爆炸效果
      * @param g
      */
     public void drawExplode(Graphics g){
-        for (Explode explode : explodes) {
-            explode.draw(g);
-        }
-//        將不可見的爆炸效果刪除
-        for (int i = 0; i < explodes.size(); i++) {
-            Explode explode = explodes.get(i);
-            if(!explode.isVisible()){
-                Explode remove = explodes.remove(i);
-                ExplodesPool.back(remove);
-                i--;
+            for (Explode explode : explodes) {
+                explode.draw(g);
             }
-        }
-    }
-
-    private class life{
+            //將不可見的爆炸效果刪除
+            for (int i = 0; i < explodes.size(); i++) {
+                Explode explode = explodes.get(i);
+                if (!explode.isVisible()) {
+                    Explode remove = explodes.remove(i);
+                    ExplodesPool.back(remove);
+                    i--;
+                }
+            }
     }
 
     //坦克的子彈和地圖所有的塊的碰撞
@@ -406,6 +503,7 @@ public abstract  class Tank {
                 MapTilePool.theReturn(tile);
                 //當主堡被擊毀後，1.5秒鐘之後切換到遊戲結束的畫面
                 if(tile.isHouse()){
+
                     delaySecondsToOver(1500);
                 }
             }
@@ -436,7 +534,7 @@ public abstract  class Tank {
      * 從tile中提取8個點，來判斷8個點是否有任何一個點和當前坦克發生碰撞
      * 點的順序從左上角的點開始，順時針偵測
      */
-    public boolean isCollideTile(List<MapTile> tiles){
+     public boolean isCollideTile(List<MapTile> tiles){
         for (MapTile tile : tiles) {
             //如果塊不可見，或是為草地塊時就不進行碰撞檢測
             if(!tile.isVisible() || tile.getType() == MapTile.TYPE_GRASS)
@@ -501,7 +599,6 @@ public abstract  class Tank {
         }
         return false;
     }
-
     //TODO
     public boolean isCollideTank(List<Tank> tanks){
         for (Tank tank : tanks) {

@@ -67,17 +67,14 @@ public class EnemyTank extends Tank{
         ai();
         switch (getEnemy_hp()){
             case 1:
-                g.drawImage(enemy_tankImg_hp1[getDir()],getX()-RADIUS,getY()-RADIUS,null );
+                g.drawImage(enemy_tankImg_hp1[getDir()],getX()-RADIUS,getY()-RADIUS,59,59,null );
                 break;
             case 2:
-                g.drawImage(enemy_tankImg_hp2[getDir()],getX()-RADIUS,getY()-RADIUS,null );
+                g.drawImage(enemy_tankImg_hp2[getDir()],getX()-RADIUS,getY()-RADIUS,59,59,null );
                 break;
             case 3:
-                g.drawImage(enemy_tankImg_hp3[getDir()],getX()-RADIUS,getY()-RADIUS,null );
+                g.drawImage(enemy_tankImg_hp3[getDir()],getX()-RADIUS,getY()-RADIUS,59,59,null );
                 break;
-//            case 4:
-//                g.drawImage(enemy_tankImg_hp2[getDir()],getX()-RADIUS,getY()-RADIUS,null );
-//                break;
         }
    }
 
