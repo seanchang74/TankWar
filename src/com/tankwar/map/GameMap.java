@@ -30,8 +30,6 @@ public class GameMap {
     //繪製主堡
     private TankHouse house;
     public GameMap() {}
-    public GameMap() {
-    }
 
     /**
      * 初始化地圖元素塊,level:第幾關

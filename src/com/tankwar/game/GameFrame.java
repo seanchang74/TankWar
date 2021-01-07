@@ -177,6 +177,7 @@ public class GameFrame extends Frame implements Runnable{
      * @param g
      */
     private void drawWin(Graphics g){
+        controllerPressedEventWin();
         int imgW = winImg.getWidth(null);
         int imgH = winImg.getHeight(null);
         int imgX = RUN_FRAME_WIDTH - imgW >>1;
@@ -248,17 +249,6 @@ public class GameFrame extends Frame implements Runnable{
         System.out.println("敵人數量"+enemies.size());
     }
 
-    /**
-     * 繪製遊戲勝利的介面
-     * @param g
-     */
-    private void drawWin(Graphics g){
-        drawOver(g);
-        //通關文字
-        g.setColor(Color.white);
-        g.setFont(FONT);
-        g.drawString("遊戲通關 !",FRAME_WIDTH/2-60,50+titleBarH);
-    }
     /**
      * 繪製遊戲結束
      * @param g
@@ -475,6 +465,9 @@ public class GameFrame extends Frame implements Runnable{
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+    }
+    private void controllerPressedEventWin() {
+        controllerPressedEventOver();
     }
     //遊戲通關的按鍵處理
     private void keyPressedEventWin(int keyCode) {
