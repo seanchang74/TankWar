@@ -59,6 +59,7 @@ public class EnemyTank extends Tank{
         enemy.setDir(dir);
         enemy.setEnemy(true);
         enemy.setStatus(STATE_MOVE);
+        Tank.tanks.add(enemy);
         return enemy;
     }
 
@@ -74,9 +75,6 @@ public class EnemyTank extends Tank{
             case 3:
                 g.drawImage(enemy_tankImg_hp3[getDir()],getX()-RADIUS,getY()-RADIUS,59,59,null );
                 break;
-//            case 4:
-//                g.drawImage(enemy_tankImg_hp2[getDir()],getX()-RADIUS,getY()-RADIUS,null );
-//                break;
         }
    }
 

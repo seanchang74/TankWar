@@ -3,7 +3,6 @@ package com.tankwar.utilis;
 import com.tankwar.tank.Tank;
 
 import java.awt.*;
-import java.net.PortUnreachableException;
 
 /*
 遊戲內常數管理
@@ -29,6 +28,7 @@ public class Constant {
     public  static final int STATE_HELP = 1;
     public  static final int STATE_RUN = 2;
     public  static final int STATE_OVER = 3;
+    public  static final int STATE_WIN = 4;
 
     public static final String[] MENUS = {
             "1 PLAYER",
