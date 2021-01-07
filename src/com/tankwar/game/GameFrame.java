@@ -55,7 +55,7 @@ public class GameFrame extends Frame implements Runnable{
     //側邊攔
     private static SideBar sideBar;
     //定義地圖相關的內容
-    private static GameMap gameMap = new GameMap();
+    private static GameMap gameMap;
     /**
      *  對視窗進行初始化
      */
@@ -209,7 +209,7 @@ public class GameFrame extends Frame implements Runnable{
         //通關文字
         g.setColor(Color.white);
         g.setFont(FONT);
-        g.drawString("遊戲通關 !",FRAME_WIDTH/2-20,50+titleBarH);
+        g.drawString("遊戲通關 !",FRAME_WIDTH/2-60,50+titleBarH);
     }
     /**
      * 繪製遊戲結束
@@ -222,7 +222,6 @@ public class GameFrame extends Frame implements Runnable{
         int imgY = FRAME_HEIGHT - imgH >>1;
         final int DIS = 250;
         g.setColor(Color.BLACK);
-        //想辦法解決@seanchang74 TODO
         g.fillRect(0,0,RUN_FRAME_WIDTH,FRAME_HEIGHT);
         g.drawImage(overImg, imgX, imgY, null);
         sideBar.drawBackground(g);
@@ -345,7 +344,6 @@ public class GameFrame extends Frame implements Runnable{
             Player_Tank_2 = new OurTank(PLAYER2_X, PLAYER2_Y, Tank.DIR_UP);
             Tank.tanks.add(Player_Tank_2);
         }
-        gameMap = new GameMap();
         sideBar = new SideBar();
         //產生敵人
         new Thread(){
