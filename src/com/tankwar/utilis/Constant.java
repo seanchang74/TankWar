@@ -3,6 +3,7 @@ package com.tankwar.utilis;
 import com.tankwar.tank.Tank;
 
 import java.awt.*;
+import java.io.IOException;
 
 /*
 遊戲內常數管理
@@ -41,6 +42,7 @@ public class Constant {
             "退出遊戲",
             "返回標題",
     };
+
     // 字體設定
     public  static final Font FONT = new Font("微軟正黑體",Font.BOLD,25);
     public  static final Font NAME_FONT = new Font("微軟正黑體",Font.BOLD,15);

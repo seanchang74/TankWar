@@ -30,6 +30,8 @@ public class GameMap {
     //繪製主堡
     private TankHouse house;
     public GameMap() {}
+    public GameMap() {
+    }
 
     /**
      * 初始化地圖元素塊,level:第幾關
@@ -47,12 +49,17 @@ public class GameMap {
         addHouse();
     }
 
+
+    //將主堡周圍的地圖塊添加到地圖的容器中
+    private void addHouse(){
+        tiles.addAll(house.getTiles());
+    }
+
     /**
      * 加載關卡訊息
      * @param level
      */
     private void loadLevel(int level) throws Exception{
-        System.out.println("Load level");
         //獲得關卡訊息類的唯一實例對象
         LevelInfo instance = LevelInfo.getInstance();
         instance.setLevel(level);
@@ -79,33 +86,30 @@ public class GameMap {
     //根據方法的名字和參數調用對應的方法
     private void invokeMethod(String methodName, String[] params) {
         for (String param : params) {
-            System.out.println("invokeMethod");
             //獲得每一行方法的參數，解析
             String[] split = param.split(",");
             int[] arr = new int[split.length];
             for (int i = 0; i < split.length; i++) {
                 arr[i] = Integer.parseInt(split[i]);
+                System.out.println("arr第"+i+"個="+arr[i]);
             }
             //塊之間的間隔是地圖塊的倍數
             final int DIS = MapTile.tileW;
+            //解析最後一個double值
+            int dis = (int)(Double.parseDouble(split[4])*DIS);
             //TODO
             switch (methodName){
                 case "addRow":
-                    addRow(MAP_X+arr[0]*DIS,MAP_Y+arr[1]*DIS,MAP_X+MAP_WIDTH-arr[2]*DIS,arr[3],arr[4]*DIS);
+                    addRow(MAP_X+arr[0]*DIS,MAP_Y+arr[1]*DIS,MAP_X+MAP_WIDTH-arr[2]*DIS,arr[3],dis);
                     break;
                 case "addCol":
-                    addCol(MAP_X+arr[0]*DIS,MAP_Y+arr[1]*DIS,MAP_Y+MAP_HEIGHT-arr[2]*DIS,arr[3],arr[4]*DIS);
+                    addCol(MAP_X+arr[0]*DIS,MAP_Y+arr[1]*DIS,MAP_Y+MAP_HEIGHT-arr[2]*DIS,arr[3],dis);
                     break;
                 case "addRect":
-                    addRect(MAP_X+arr[0]*DIS,MAP_Y+arr[1]*DIS,MAP_X+MAP_WIDTH-arr[2]*DIS,MAP_Y+MAP_HEIGHT-arr[3]*DIS,arr[4],arr[5]*DIS);
+                    addRect(MAP_X+arr[0]*DIS,MAP_Y+arr[1]*DIS,MAP_X+MAP_WIDTH-arr[2]*DIS,MAP_Y+MAP_HEIGHT-arr[3]*DIS,arr[4],DIS+10);
                     break;
             }
         }
-    }
-
-    //將主堡周圍的地圖塊添加到地圖的容器中
-    private void addHouse(){
-        tiles.addAll(house.getTiles());
     }
 
     /**
