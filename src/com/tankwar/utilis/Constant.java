@@ -68,4 +68,13 @@ public class Constant {
     public static final int PLAYER1_Y = FRAME_HEIGHT- Tank.RADIUS*2;
     public static final int PLAYER2_X = RUN_FRAME_WIDTH / 3 * 2;
     public static final int PLAYER2_Y = FRAME_HEIGHT - Tank.RADIUS * 2;
+    /********************按鍵控制相關*******************/
+    public static final String BUTTON_A = "0";
+    public static final String BUTTON_B = "1";
+    public static final String BUTTON_X = "3";
+    public static final String BUTTON_Y = "2";
+    public static final String PAD_UP = "0.25";
+    public static final String PAD_DOWN = "0.75";
+    public static final String PAD_LEFT = "0.5";
+    public static final String PAD_RIGHT = "1.0";
 }

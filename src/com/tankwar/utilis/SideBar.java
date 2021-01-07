@@ -1,8 +1,5 @@
 package com.tankwar.utilis;
 
-import com.tankwar.game.GameFrame;
-import com.tankwar.tank.Tank;
-
 import java.awt.*;
 
 import static com.tankwar.utilis.Constant.*;
@@ -16,7 +13,7 @@ public class SideBar {
     public SideBar(){};
     //sidebar相關繪製
     public void draw(Graphics g,int player){
-        drawScore(g);//血條繪製
+//        drawScore(g);//血條繪製
         drawLife(g,player);
     }
 
@@ -28,10 +25,10 @@ public class SideBar {
      * 繪製分數(暫) TODO
      * @param g
      */
-    private void drawScore(Graphics g){
-        g.setColor(Color.BLACK);
-        g.drawString("Score "+score,SIDEBAR_X,Constant.FRAME_HEIGHT-20);
-    }
+//    private void drawScore(Graphics g){
+//        g.setColor(Color.BLACK);
+//        g.drawString("Score "+score,SIDEBAR_X,Constant.FRAME_HEIGHT-20);
+//    }
 
     //玩家圖片p1
     private static Image player1icon = MyUtil.createImage("res/image/material/player1.png");

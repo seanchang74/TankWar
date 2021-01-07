@@ -7,6 +7,11 @@ import com.tankwar.tank.Tank;
 import com.tankwar.utilis.MyUtil;
 import com.tankwar.utilis.PlayerHandling;
 import com.tankwar.utilis.SideBar;
+import net.java.games.input.Component;
+import net.java.games.input.Controller;
+import net.java.games.input.ControllerEnvironment;
+import net.java.games.input.Event;
+import net.java.games.input.EventQueue;
 
 import javax.swing.*;
 import java.applet.AudioClip;
@@ -133,6 +138,7 @@ public class GameFrame extends Frame implements Runnable{
      * @param g
      */
     private void drawMenu(Graphics g){
+        controllerPressedEventMenu();
         //繪製背景
         g.setColor(Color.BLACK);
         g.fillRect(0,0,FRAME_WIDTH,FRAME_HEIGHT);
@@ -175,6 +181,9 @@ public class GameFrame extends Frame implements Runnable{
         if(menuIndex ==1)
             if(Player_Tank_2!=null)
             Player_Tank_2.draw(g,2);
+        //搖桿控制
+        controllerPressedEventRun();
+//        controllerReleasedEventRun();
         //繪製地圖的遮擋層
         gameMap.drawCover(g);
         //碰撞檢測
@@ -216,6 +225,7 @@ public class GameFrame extends Frame implements Runnable{
      * @param g
      */
     private void drawOver(Graphics g) {
+        controllerPressedEventOver();
         int imgW = overImg.getWidth(null);
         int imgH = overImg.getHeight(null);
         int imgX = RUN_FRAME_WIDTH - imgW >>1;
@@ -289,13 +299,148 @@ public class GameFrame extends Frame implements Runnable{
                 }
             }
         });
+        //搖桿監聽
+        ReadAllEvents();
     }
+    //TODO
+    private int controller = 0;
+    private String button = "";
+    private boolean buttonState = false;
+    private void ReadAllEvents() {
+        //find controller
+        Controller[] all_controllers =  ControllerEnvironment
+                .getDefaultEnvironment().getControllers();
+        /* Get the available controllers */
+        List<Controller> controllers = new ArrayList<Controller>();
+        if (all_controllers.length == 0) {
+            System.out.println("找不到控制器");
+            System.exit(0);
+        }
 
+        for (int i = 0; i < all_controllers.length; i++) {
+            /* Remember to poll each one */
+            all_controllers[i].poll();
+            if(all_controllers[i].toString().equals("Controller (XBOX 360 For Windows)")||all_controllers[i].toString().equals("Wireless Gamepad")){
+                controllers.add(all_controllers[i]);
+                System.out.println("找到了");
+            }
+        }
+        for (int i = 0; i < controllers.toArray().length; i++) {
+            System.out.println(controllers.get(i));
+        }
+        new Thread() {
+            @Override
+            public void run() {
+                while (true){
+
+
+                    for (int i = 0; i < controllers.toArray().length; i++) {
+                        /* Remember to poll each one */
+                        controllers.get(i).poll();
+                        /* Get the controllers event queue */
+                        EventQueue queue = controllers.get(i).getEventQueue();
+
+
+                        /* Create an event object for the underlying plugin to populate */
+                        Event event = new Event();
+
+                        /* For each object in the queue */
+                        while (queue.getNextEvent(event)) {
+
+                            StringBuffer buffer = new StringBuffer(controllers.get(i)
+                                    .getName());
+                            buffer.append(", ");
+                            Component comp = event.getComponent();
+                            Component.Identifier identifier = comp.getIdentifier();
+                            buffer.append(identifier.toString()).append(" changed to ");
+                            float value = event.getValue();
+
+                            /*
+                             * Check the type of the component and display an
+                             * appropriate value
+                             */
+                            if (comp.isAnalog()) {
+                                buffer.append(value);
+                            } else {
+                                System.out.println(value);
+                                //被壓下
+                                if (value == 1.0f) {
+                                    buffer.append("On");
+                                    buttonState = true;
+                                }
+                                //被放開
+                                else {
+                                    buffer.append("Off");
+                                    buttonState = false;
+                                }
+                            }
+                            System.out.println(buffer.toString());
+                            if(i == 0){
+                                setController(1);
+                            }
+                            else if(i == 1){
+                                setController(2);
+                            }
+                            setButton(identifier.toString());
+                            if(button == "pov"){
+                                System.out.println("pov");
+                                setButton(String.valueOf(event.getValue()));
+                            }
+                            System.out.println("controller: "+controller);
+                            System.out.println("button: "+button);
+                        }
+                    }
+
+                    /*
+                     * Sleep for 20 milliseconds, in here only so the example doesn't
+                     * thrash the system.
+                     */
+                    try {
+                        Thread.sleep(20);
+                    } catch (InterruptedException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+
+                }
+            }
+        }.start();
+
+    }
+    private void controllerPressedEventMenu() {
+        button = getButton();
+        switch (button){
+            case PAD_UP:
+                if(--menuIndex<0){
+                    menuIndex = MENUS.length-1;
+                }
+                break;
+            case PAD_DOWN:
+                if(++menuIndex>MENUS.length-1){
+                    menuIndex = 0;
+                }
+                break;
+            case BUTTON_A:{
+                //開始新遊戲
+                if(menuIndex == 0 || menuIndex == 1) {
+                    startGame(1);
+                    break;
+                }
+                else if(menuIndex == MENUS.length-1){
+                    System.exit(0);
+                }
+            }
+        }try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
     //遊戲通關的按鍵處理
     private void keyPressedEventWin(int keyCode) {
         keyPressedEventOver(keyCode);
     }
-
     private void keyPressedEventMenu(int keyCode) {
         switch (keyCode){
             case KeyEvent.VK_UP:
@@ -374,6 +519,56 @@ public class GameFrame extends Frame implements Runnable{
 
     }
 
+    private void controllerPressedEventRun() {
+        if(Player_Tank_1!=null && controller == 1){
+            switch (button) {
+                //玩家1
+                case PAD_UP:
+                    Player_Tank_1.setDir(Tank.DIR_UP);
+                    Player_Tank_1.setStatus(Tank.STATE_MOVE);
+                    break;
+                case PAD_DOWN:
+                    Player_Tank_1.setDir(Tank.DIR_DOWN);
+                    Player_Tank_1.setStatus(Tank.STATE_MOVE);
+                    break;
+                case PAD_RIGHT:
+                    Player_Tank_1.setDir(Tank.DIR_LEFT);
+                    Player_Tank_1.setStatus(Tank.STATE_MOVE);
+                    break;
+                case PAD_LEFT:
+                    Player_Tank_1.setDir(Tank.DIR_RIGHT);
+                    Player_Tank_1.setStatus(Tank.STATE_MOVE);
+                    break;
+                case BUTTON_A:
+                    Player_Tank_1.fire();
+                    break;
+            }
+        }
+        if(Player_Tank_2!=null && controller==2){
+            switch (button) {
+                //玩家2
+                case PAD_UP:
+                    Player_Tank_2.setDir(Tank.DIR_UP);
+                    Player_Tank_2.setStatus(Tank.STATE_MOVE);
+                    break;
+                case PAD_DOWN:
+                    Player_Tank_2.setDir(Tank.DIR_DOWN);
+                    Player_Tank_2.setStatus(Tank.STATE_MOVE);
+                    break;
+                case PAD_RIGHT:
+                    Player_Tank_2.setDir(Tank.DIR_LEFT);
+                    Player_Tank_2.setStatus(Tank.STATE_MOVE);
+                    break;
+                case PAD_LEFT:
+                    Player_Tank_2.setDir(Tank.DIR_RIGHT);
+                    Player_Tank_2.setStatus(Tank.STATE_MOVE);
+                    break;
+                case BUTTON_A:
+                    Player_Tank_2.fire();
+                    break;
+            }
+        }
+    }
     private void keyPressedEventRun(int keyCode) {
         if(Player_Tank_1!=null){
             switch (keyCode) {
@@ -424,6 +619,24 @@ public class GameFrame extends Frame implements Runnable{
             }
         }
     }
+    //手把被鬆開
+    private void controllerReleasedEventRun() {
+        if (!buttonState)
+        {
+            switch (button){
+                //玩家1
+                case PAD_UP:
+                case PAD_DOWN:
+                case PAD_LEFT:
+                case  PAD_RIGHT:
+                    if(Player_Tank_1!=null && controller == 1)
+                        Player_Tank_1.setStatus(Tank.STATE_STAND);
+                    if(Player_Tank_2!=null && controller == 2)
+                        Player_Tank_2.setStatus(Tank.STATE_STAND);
+                    break;
+            }
+        }
+    }
     //按鍵被鬆開的處理
     private void keyReleasedEventRun(int keyCode) {
         switch (keyCode){
@@ -434,18 +647,38 @@ public class GameFrame extends Frame implements Runnable{
             case KeyEvent.VK_D:
                 if(Player_Tank_1!=null)
                 Player_Tank_1.setStatus(Tank.STATE_STAND);
-                break;
-            //玩家2
-            case KeyEvent.VK_UP:
-            case KeyEvent.VK_DOWN:
-            case KeyEvent.VK_LEFT:
-            case KeyEvent.VK_RIGHT:
                 if(Player_Tank_2!=null)
                 Player_Tank_2.setStatus(Tank.STATE_STAND);
                 break;
         }
     }
-
+    private void controllerPressedEventOver() {
+        switch (button){
+            case PAD_RIGHT:
+                if(--overIndex<0){
+                    overIndex=0;
+                }
+                break;
+            case PAD_LEFT:
+                if(++overIndex>1){
+                    overIndex=1;
+                }
+                break;
+            case BUTTON_A:{
+                //結束遊戲
+                if(overIndex == 0) {
+                    System.exit(0);
+                }
+                //回到標題
+                else if(overIndex == 1){
+                    gameState =  STATE_MENU;
+                    //重製遊戲
+                    resetGame();
+                }
+                break;
+            }
+        }
+    }
     /**
      * 遊戲結束按鍵處理
      * @param keyCode
@@ -605,6 +838,22 @@ public class GameFrame extends Frame implements Runnable{
         Player_Tank_1.drawExplode(g);
         if(Player_Tank_2!=null)
         Player_Tank_2.drawExplode(g);
+    }
+
+    public int getController() {
+        return controller;
+    }
+
+    public void setController(int controller) {
+        this.controller = controller;
+    }
+
+    public String getButton() {
+        return button;
+    }
+
+    public void setButton(String button) {
+        this.button = button;
     }
 
     public static int getGameState() {
