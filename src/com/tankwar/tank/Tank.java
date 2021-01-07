@@ -452,15 +452,14 @@ public abstract  class Tank {
                 //判斷遊戲是否通關?
                 if (GameFrame.isLastLevel()) {
                     //通關了
-                    GameFrame.setGameState(Constant.STATE_WIN);
-                    Tank.tanks.clear();
+                    delaySecondsToOver(1500,Constant.STATE_WIN);
                 } else {
                     //進入下一關
-                    GameFrame.nextLevel();
+                    delaySecondsToChange(1500);
                 }
             }
         }else{
-            delaySecondsToOver(1500);
+            delaySecondsToOver(1500,Constant.STATE_OVER);
         }
     }
     //敵人坦克死亡判斷
@@ -504,7 +503,7 @@ public abstract  class Tank {
                 //當主堡被擊毀後，1.5秒鐘之後切換到遊戲結束的畫面
                 if(tile.isHouse()){
 
-                    delaySecondsToOver(1500);
+                    delaySecondsToOver(1500,Constant.STATE_OVER);
                 }
             }
         }
@@ -512,10 +511,10 @@ public abstract  class Tank {
 
 
     /**
-     * 延遲若干毫秒切換到遊戲結束
+     * 延遲若干毫秒切換遊戲狀態
      * @param millisSecond
      */
-    private void delaySecondsToOver(int millisSecond){
+    private void delaySecondsToOver(int millisSecond,int STATE){
         new Thread(){
             public void run(){
                 try {
@@ -524,7 +523,24 @@ public abstract  class Tank {
                     e.printStackTrace();
                 }
                 Tank.tanks.clear();
-                GameFrame.setGameState(Constant.STATE_OVER);
+                GameFrame.setGameState(STATE);
+            }
+        }.start();
+    }
+
+    /**
+     * 延遲若干毫秒切換到遊戲結束
+     * @param millisSecond
+     */
+    private void delaySecondsToChange(int millisSecond){
+        new Thread(){
+            public void run(){
+                try {
+                    Thread.sleep(millisSecond);
+                }catch (InterruptedException e){
+                    e.printStackTrace();
+                }
+                GameFrame.nextLevel();
             }
         }.start();
     }

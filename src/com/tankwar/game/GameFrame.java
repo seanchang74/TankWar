@@ -1,5 +1,7 @@
 package com.tankwar.game;
 import com.tankwar.map.GameMap;
+import com.tankwar.map.MapTile;
+import com.tankwar.utilis.Constant;
 import com.tankwar.tank.EnemyTank;
 import com.tankwar.tank.OurTank;
 import com.tankwar.utilis.MusicUtil;
@@ -52,6 +54,10 @@ public class GameFrame extends Frame implements Runnable{
     private static ImageIcon icon = new ImageIcon("res/image/tank/enemies/enemy3U.gif");
     //結束遊戲圖片
     private static Image overImg = MyUtil.createImage("res/image/material/over.png");
+    //遊戲勝利圖片
+    private static Image winImg = MyUtil.createImage("res/image/material/win.png");
+    //遊戲開始圖片
+    private static Image startImg = MyUtil.createImage("res/image/material/start.png");
     //側邊攔
     private static SideBar sideBar;
     //定義地圖相關的內容
@@ -137,6 +143,9 @@ public class GameFrame extends Frame implements Runnable{
         //繪製背景
         g.setColor(Color.BLACK);
         g.fillRect(0,0,FRAME_WIDTH,FRAME_HEIGHT);
+        int imgW = startImg.getWidth(null);
+        int imgH = startImg.getHeight(null);
+        g.drawImage(startImg,FRAME_WIDTH-imgW >> 1,FRAME_HEIGHT/12*1,null);
 
         final int STR_WIDTH = 120;
         int x = FRAME_WIDTH - STR_WIDTH >>1;
@@ -162,11 +171,28 @@ public class GameFrame extends Frame implements Runnable{
      * @param g
      */
     private void drawWin(Graphics g){
-        drawOver(g);
-        //通關文字
-        g.setColor(Color.white);
-        g.setFont(FONT);
-        g.drawString("遊戲通關 !",FRAME_WIDTH/2-20,50+titleBarH);
+        int imgW = winImg.getWidth(null);
+        int imgH = winImg.getHeight(null);
+        int imgX = RUN_FRAME_WIDTH - imgW >>1;
+        int imgY = FRAME_HEIGHT - imgH >>1;
+        final int DIS = 250;
+        g.setColor(Color.BLACK);
+        //想辦法解決@seanchang74 TODO
+        g.fillRect(0,0,RUN_FRAME_WIDTH,FRAME_HEIGHT);
+        g.drawImage(winImg, imgX, imgY, null);
+        sideBar.drawBackground(g);
+        sideBar.draw(g,1);
+        if(menuIndex == 1)sideBar.draw(g,2);
+        //提供選單
+        for (int i = 0; i < OVER_STR.length; i++) {
+            //紅色菜單
+            if(i == overIndex){
+                g.setColor(Color.RED);
+            }
+            else g.setColor(Color.WHITE);
+            g.drawString(OVER_STR[i], imgX+40+DIS*i,imgY+imgH+20 );
+        }
+        System.out.println(imgX+" "+imgY);
     }
     private void drawRun(Graphics g) {
         //繪製背景
@@ -213,17 +239,6 @@ public class GameFrame extends Frame implements Runnable{
         System.out.println("敵人數量"+enemies.size());
     }
 
-    /**
-     * 繪製遊戲勝利的介面
-     * @param g
-     */
-    private void drawWin(Graphics g){
-        drawOver(g);
-        //通關文字
-        g.setColor(Color.white);
-        g.setFont(FONT);
-        g.drawString("遊戲通關 !",FRAME_WIDTH/2-20,50+titleBarH);
-    }
     /**
      * 繪製遊戲結束
      * @param g
@@ -355,11 +370,10 @@ public class GameFrame extends Frame implements Runnable{
         Player_Tank_1 = new OurTank(PLAYER1_X,PLAYER1_Y,Tank.DIR_UP);
         Tank.tanks.add(Player_Tank_1);
         if(menuIndex==1) {
-            System.out.println("new 2");
             Player_Tank_2 = new OurTank(PLAYER2_X, PLAYER2_Y, Tank.DIR_UP);
             Tank.tanks.add(Player_Tank_2);
         }
-        gameMap = new GameMap();
+//        gameMap = new GameMap();
         sideBar = new SideBar();
         //產生敵人
         new Thread(){
