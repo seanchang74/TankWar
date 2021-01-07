@@ -352,9 +352,11 @@ public class GameFrame extends Frame implements Runnable{
             @Override
             public void run() {
                 while (true){
-                    if(enemies.size()< ENEMY_MAX_COUNT){
+                    if(LevelInfo.getInstance().getEnemyCount() > bornEnemyCount&&
+                            enemies.size() < ENEMY_MAX_COUNT){
                         Tank enemy = EnemyTank.createEnemy();
                         enemies.add(enemy);
+                        bornEnemyCount ++;
                     }
                     try {
                         Thread.sleep(ENEMY_BORN_INTERVAL);
