@@ -412,7 +412,6 @@ public class GameFrame extends Frame implements Runnable{
                             }
                             setButton(identifier.toString());
                             if(button == "pov"){
-                                System.out.println("pov");
                                 setButton(String.valueOf(event.getValue()));
                             }
                             System.out.println("controller: "+controller);
@@ -449,7 +448,7 @@ public class GameFrame extends Frame implements Runnable{
                     menuIndex = 0;
                 }
                 break;
-            case BUTTON_A:{
+            case BUTTON_B:{
                 //開始新遊戲
                 if(menuIndex == 0 || menuIndex == 1) {
                     startGame(1);
@@ -695,7 +694,7 @@ public class GameFrame extends Frame implements Runnable{
                     overIndex=1;
                 }
                 break;
-            case BUTTON_A:{
+            case BUTTON_B:{
                 //結束遊戲
                 if(overIndex == 0) {
                     System.exit(0);

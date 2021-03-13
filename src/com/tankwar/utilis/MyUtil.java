@@ -1,13 +1,6 @@
 package com.tankwar.utilis;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.awt.image.CropImageFilter;
-import java.awt.image.FilteredImageSource;
-import java.awt.image.ImageFilter;
-import java.io.File;
-import java.io.IOException;
 
 
 public class MyUtil {
@@ -58,7 +51,7 @@ public class MyUtil {
         //正方形中心點和 點的X，Y軸的距離
         int disX = Math.abs(rectX-pointX);
         int disY = Math.abs(rectY-pointY);
-        if (disX <= radius && disY <= radius){
+        if (disX < radius && disY < radius){
             return true;
         }
         else return false;
