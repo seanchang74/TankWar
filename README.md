@@ -1,49 +1,36 @@
-# Java 期末專題討論
+# Tankwar Game
 
-[![hackmd-github-sync-badge](https://hackmd.io/dutid6zlTx-RpunfoSweeA/badge)](https://hackmd.io/dutid6zlTx-RpunfoSweeA)
+### Game Introduction：[click here](https://strategywiki.org/wiki/Battle_City)
 
+### Basic Functions
+- [x] Special signal before the enemy appears
+- [x] Support single/multiple players mode
+- [x] Can see how many lives did the player left at right sidebar
+- [x] Everytime when the player reborn again, it will have infinity status (won't get hurt when shot by the bullet) for 3 seconds 
+- [x] Support bluetooth control, player can use the joystick to control your tank remotely!
 
-### **[教學影片連結](https://www.bilibili.com/video/BV1MJ411x77d?p=1)**
+### How to Play ?
+- Kill all of the enemy to win the game
+- If Your castle was been attacked or the player consumes all of their lives, then gameover! 
 
-### 遊戲介紹wiki：[https://strategywiki.org/wiki/Battle_City](https://strategywiki.org/wiki/Battle_City)
+### Environment 🧱
 
-### 遊戲基本規劃與構想
-1. ~~坦克在血量於一定程度時，會閃紅色，接著坦克會變顏色，在最後一擊後觸發爆炸效果(暫定~~
-2. 添加遊戲資訊欄(生命值，敵人數量等等)在遊戲畫面右上角
-3. 敵人出現要先有星星
-4. 玩家重生時有無敵效果(3秒) >> 被子彈打到時不會扣血
-5. 每次坦克發射子彈間隔0.5秒
-6. ~~坦克跟坦克碰撞，子彈跟子彈碰撞~~
-7. 2P構成
-8. 可用Joy Con控制
+| Bricks | Wall | Trees | Water |
+|:------------------------------------:|:------------------------------------:|:------------------------------------:|:------------------------------------:|
+| ![](https://i.imgur.com/ATrTbAb.png) | ![](https://i.imgur.com/KoHiqDv.png) | ![](https://i.imgur.com/kaa4IDD.png) | ![](https://i.imgur.com/lmkU7OW.png) |
+| Bullet can destroy, tank cannot cross | Neither bullet can destroy nor tank can cross  | Bullet cannot destroy, tank can cross | Bullet can cross, tank cannot cross |
 
-### 遊戲流程
-1. 擊敗所有敵人即可通關
-2. 若主堡被攻擊，變圖片等3秒，或玩家消耗所有生命則Gameover
-3. ~~可藉由地圖道具獲得增益或升級的效果~~
+### Enemy Tank ⚔️
 
-### 遊戲地形
-1. 磚頭可破壞，不可穿越
-2. 鐵塊不可破壞
-3. 草地不可破壞，可穿越
-4. 水流坦克無法穿越，子彈可以穿越
+| White Tank  | Green Tank | Yellow Tank |
+|:-------------------------------------:|:---------------------------------------------: |:-------------------------------------:|
+| ![](https://i.imgur.com/y8v4oji.gif)  | ![](https://i.imgur.com/zIlaZIf.gif)          | ![](https://i.imgur.com/4ksvFa9.gif)  |
+| 1 life | 2 lives | 3 lives |
 
-### ~~遊戲道具~~(已棄用)
-1. ~~安全帽:無敵3秒~~
-2. ~~計時器:全場不可攻擊，不可移動5秒~~
-3. ~~手榴彈:清空全場敵人~~
-4. ~~坦克:生命數+1，滿血獲得20000分~~
+### Screenshots 📷
 
-### ~~敵人坦克AI添加~~(已廢棄 ~~後來發現不需要就夠強了~~)
-1. ~~一旦我方坦克與敵人坦克距離小於多少值，敵人坦克就會跟著坦克~~
-2. ~~當敵人靠近主堡距離小於多少值，敵人坦克就會衝向主堡~~
-3. ~~敵人介紹文(再討論可能性)~~
-![](https://i.imgur.com/ibtwrgu.png)
-
-
-
-### 實際畫面
-
-![](https://i.imgur.com/tTM49RQ.png)
-
-
+| **StartGame** | **GameOver** | **Win Game** |
+|:---------:|:--------:|:--------:|
+| ![](https://i.imgur.com/WlPBDSq.png) | ![](https://i.imgur.com/8xohHY3.png) | ![](https://i.imgur.com/Bfy0nW2.png) |
+| **Level 1** | **Level 2** | **Level 3** |
+| ![](https://i.imgur.com/l1m4z98.png) | ![](https://i.imgur.com/WXtsEKu.png) | ![](https://i.imgur.com/SGGed0x.png) |
